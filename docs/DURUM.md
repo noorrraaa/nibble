@@ -759,20 +759,24 @@ yükseltme. `next build` 4. oturumda çalıştırılmadı (dev sunucusu açıkt�
    build ayrı bir yol olduğu için (statik export + prerender) bu adım şarttı.
    Aynı turda `npm test` **257/257** yeşil.
 2. ✅ **`git init` + ilk commit + push.** Repo kökü `nibble/`, dal `main`,
-   ilk commit `1ebea02` (**56 dosya, +25.709 satır**), remote
+   ilk commit `e04f370` (**56 dosya, +25.709 satır**), remote
    `git@github-kisisel:noorrraaa/nibble.git` → push'landı, ağaç temiz.
    `.gitignore` doğru tuttu: `node_modules/ · .next/ · out/ · test-build/ ·
-   *.tsbuildinfo` hiçbiri girmedi. Commit kimliği global ayardan geldi
-   (`Emre K <emre.k@dekatechs.com>`) — Astronom ve hatirlatici ile aynı,
-   wovel `emrekizak5@gmail.com` kullanıyor; noorrraaa profilinde yeşil
-   görünmesi için o adresin hesaba ekli olması gerekir.
+   *.tsbuildinfo` hiçbiri girmedi. İlk turda commit kimliği global
+   ayardan **iş maili** olarak geldi (portföydeki 14 reponun hepsinde aynı
+   hata vardı); aynı gün düzeltildi — geçmiş `Emre Kızak
+   <emrekizak5@gmail.com>` olarak yeniden yazılıp force-push edildi. İçerik
+   değişmedi (ağaç hash'leri birebir aynı), **SHA'lar değişti**. Artık
+   `~/Desktop/hayat/` altında açılan her repo kişisel kimliği `~/.gitconfig`
+   içindeki `includeIf gitdir:~/Desktop/hayat/` kuralıyla otomatik alıyor.
 
 ### 3. adım: LİSANS + HOST — kullanıcı kararı, hâlâ açık
 
-- **Lisans yok.** Repo şu an lisans dosyasız duruyor; repo public'se bu
-  "her hak saklı" demektir (kimse yasal olarak fork/kullanamaz), yani
-  "ücretsiz ve herkese açık" konumlandırmasıyla çelişir. 4. oturumda
-  bilinçli olarak boş bırakıldı ("lisans yok, ben hallederim").
+- **Lisans yok.** Repo **private** olduğu için şu an aciliyeti yok
+  (kullanıcı 2026-08-24'te teyit etti). Ama repo public'e çevrildiği gün
+  lisans dosyasızlık "her hak saklı" demek olur — kimse yasal olarak
+  fork/kullanamaz — ve bu, README'deki "free, no account, forever free"
+  konumlandırmasıyla çelişir. Yayına çıkarken MIT tek dosya yeter.
 - **Host seçilmedi.** Statik export hazır (`out/`). GitHub Pages alt dizinde
   yayınlanırsa `next.config.ts`'e **`basePath` şart**; Vercel/Netlify/Cloudflare
   Pages kökten servis ederse dokunmak gerekmez.
