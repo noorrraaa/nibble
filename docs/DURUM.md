@@ -1,10 +1,13 @@
 # NIBBLE — Durum ve Devam Notu
 
-**Son güncelleme:** 2026-08-21 (4. oturum) · **Repo düzeni + README + dosya dosya
-güvenlik denetimi: iki güvenlik açığı, dört sessiz veri/geçmiş hatası ve bir
-performans gerilemesi bulundu, doğrulandı, düzeltildi ve testle kilitlendi (§12).**
-**Kalan tek büyük iş: yayına alma — build, `git init`, host (§13).**
-**Pazartesi (2026-08-24) buradan devam: §13.**
+**Son güncelleme:** 2026-08-24 (5. oturum) · **Yayına alma başladı: temiz
+`next build` koştu, `git init` + ilk commit yapıldı ve repo push'landı
+(`noorrraaa/nibble`, main). Kalan: LİSANS + HOST seçimi — ikisi de kullanıcı
+kararı (§13).** Proje `~/Desktop/hayat/nibble` altına taşındı.
+
+4. oturum (2026-08-21): repo düzeni + README + dosya dosya güvenlik denetimi —
+iki güvenlik açığı, dört sessiz veri/geçmiş hatası ve bir performans gerilemesi
+bulundu, doğrulandı, düzeltildi ve testle kilitlendi (§12).
 
 ---
 
@@ -606,7 +609,7 @@ rengini bu test yakaladı.
 Dosyalar repo düzenine alındı: kök artık `nibble/`, belgeler `docs/` altında
 (`PLAN.md`, bu dosya, `landing-concept.html`), `README.md` (EN) + `README.tr.md`
 (TR) + `.gitignore` yazıldı. Lisans ve deploy yapılandırması bilinçli olarak
-YOK — kullanıcı kendi halledecek. `git init` henüz yapılmadı.
+YOK — kullanıcı kendi halledecek. (`git init` 5. oturumda yapıldı, §13.)
 
 Sonra `src/` altındaki 40 dosya tek tek okundu. Bulgular tahminle bırakılmadı:
 her biri ya Node'da ya Chrome'da çalıştırılıp doğrulandı, düzeltildi ve
@@ -740,28 +743,39 @@ Keyfi açı döndürme kutuyu 2048'in üstüne büyütemiyor (sınırlı, çökm
 
 **Kalan bilinen durum:** `npm audit` hâlâ 3 high (postcss, sharp) — dev
 bağımlılığı, bu üründe sömürülebilir değil, düzeltmesi Next 16'ya kırıcı
-yükseltme. `next build` bu oturumda çalıştırılmadı (dev sunucusu açıktı;
-ikisi aynı `.next`'i kullanıyor).
+yükseltme. `next build` 4. oturumda çalıştırılmadı (dev sunucusu açıktı; ikisi aynı
+`.next`'i kullanıyor) — **5. oturumda koşuldu ve temiz geçti**, bkz. §13.
 
 ---
 
-## 13. Sırada ne kaldı — PAZARTESİ BURADAN DEVAM (2026-08-24)
+## 13. Sırada ne kaldı — yayına alma (5. oturum, 2026-08-24)
 
-### Yayına alma: kalan üç adım
+### İlk iki adım BİTTİ
 
-Kod tarafı hazır (`output: "export"`, `out/` üretiliyor), belgeler yazıldı
-(`README.md` + `README.tr.md` + `.gitignore`). Kalanlar sırayla:
+1. ✅ **Temiz `next build`.** `rm -rf .next` → `npm run build` sırasıyla
+   koşuldu (dev sunucusu kapalıydı): `✓ Compiled successfully`, **6 rota
+   statik export edildi** (`/`, `/_not-found`, `/agent`, `/editor`), editör
+   first-load **175 kB**, hata/uyarı yok. Denetimde 30+ dosya değişmişti,
+   build ayrı bir yol olduğu için (statik export + prerender) bu adım şarttı.
+   Aynı turda `npm test` **257/257** yeşil.
+2. ✅ **`git init` + ilk commit + push.** Repo kökü `nibble/`, dal `main`,
+   ilk commit `1ebea02` (**56 dosya, +25.709 satır**), remote
+   `git@github-kisisel:noorrraaa/nibble.git` → push'landı, ağaç temiz.
+   `.gitignore` doğru tuttu: `node_modules/ · .next/ · out/ · test-build/ ·
+   *.tsbuildinfo` hiçbiri girmedi. Commit kimliği global ayardan geldi
+   (`Emre K <emre.k@dekatechs.com>`) — Astronom ve hatirlatici ile aynı,
+   wovel `emrekizak5@gmail.com` kullanıyor; noorrraaa profilinde yeşil
+   görünmesi için o adresin hesaba ekli olması gerekir.
 
-1. **`npm run build`'i temiz koş.** 4. oturumda KOŞULMADI çünkü dev sunucusu
-   açıktı ve ikisi aynı `.next`'i kullanıyor. Doğru sıra: dev'i durdur →
-   `rm -rf .next` → `npm run build`. Denetimde 30+ dosya değişti, bu yüzden
-   build'in yeşil olduğunu görmek ilk iş olmalı (test/lint/typecheck zaten
-   yeşil, ama build ayrı bir yol: statik export ve sayfa prerender'ı).
-2. **`git init` + ilk commit.** Repo kökü `nibble/`. Henüz git deposu değil.
-3. **Lisans ve host seçimi — kullanıcının kararı.** 4. oturumda açıkça
-   "lisans yok, ben ahllederiz" dendi; lisans dosyası ve deploy yapılandırması
-   bilinçli olarak YOK. Host seçilince `next.config.ts`'e dokunmak gerekebilir
-   (GitHub Pages alt dizinde yayınlanırsa `basePath` şart).
+### 3. adım: LİSANS + HOST — kullanıcı kararı, hâlâ açık
+
+- **Lisans yok.** Repo şu an lisans dosyasız duruyor; repo public'se bu
+  "her hak saklı" demektir (kimse yasal olarak fork/kullanamaz), yani
+  "ücretsiz ve herkese açık" konumlandırmasıyla çelişir. 4. oturumda
+  bilinçli olarak boş bırakıldı ("lisans yok, ben hallederim").
+- **Host seçilmedi.** Statik export hazır (`out/`). GitHub Pages alt dizinde
+  yayınlanırsa `next.config.ts`'e **`basePath` şart**; Vercel/Netlify/Cloudflare
+  Pages kökten servis ederse dokunmak gerekmez.
 
 ### Ürün listesi (öncelik sırası değil)
 
@@ -821,7 +835,7 @@ Kod tarafı hazır (`output: "export"`, `out/` üretiliyor), belgeler yazıldı
 ## 15. Çalıştırma
 
 ```sh
-cd ~/Desktop/pixelArt/nibble     # repo kökü burası
+cd ~/Desktop/hayat/nibble        # repo kökü burası
 npm run dev        # http://localhost:3000
 npm test           # 257 test (tsc -> CommonJS + node --test)
 npm run lint       # eslint 9 + eslint-config-next
