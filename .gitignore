@@ -1,0 +1,23 @@
+# bağımlılıklar
+node_modules/
+
+# Next.js
+.next/
+out/
+
+# derleme çıktıları
+test-build/
+*.tsbuildinfo
+
+# ortam
+.env
+.env.*
+
+# işletim sistemi / editör
+.DS_Store
+*.log
+.vscode/
+.idea/
+
+# yerel ajan ayarları
+.claude/settings.local.json

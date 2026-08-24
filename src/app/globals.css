@@ -1,0 +1,1644 @@
+/* ─────────────────────────────────────────────────────────────
+   NIBBLE — tasarım sistemi
+   Palet: Sweetie-16 türevi (gerçek bir pixel art paleti)
+   Editör koyu-öncelikli; açık tema açıkça yeniden tanımlanır.
+   ───────────────────────────────────────────────────────────── */
+
+:root {
+  --ground: #14161f;
+  --ground-2: #1a1c2c;
+  --surface: #21243a;
+  --surface-2: #2b2f4a;
+  --line: #383d5c;
+  --ink: #f4f4f4;
+  --muted: #94b0c2;
+  --dim: #6a7594;
+
+  --coral: #ef7d57;
+  --crim: #b13e53;
+  --gold: #ffcd75;
+  --blue: #41a6f6;
+  --cyan: #73eff7;
+  --green: #38b764;
+  --plum: #5d275d;
+
+  --accent: var(--coral);
+  --accent-cool: var(--blue);
+  --shadow: 0 2px 0 rgba(0, 0, 0, 0.45);
+
+  --mono: ui-monospace, "SF Mono", SFMono-Regular, "JetBrains Mono", Menlo, Consolas, monospace;
+  --serif: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
+}
+
+:root[data-theme="light"] {
+  --ground: #e9ebf0;
+  --ground-2: #f4f5f8;
+  --surface: #ffffff;
+  --surface-2: #eef0f5;
+  --line: #c9cfdd;
+  --ink: #1a1c2c;
+  --muted: #566c86;
+  --dim: #8695ac;
+  --coral: #d9583a;
+  --crim: #a02f45;
+  --gold: #c98b1e;
+  --blue: #1e7fd4;
+  --cyan: #2b9fb0;
+  --green: #2a8f4c;
+  --plum: #6b3070;
+  --shadow: 0 2px 0 rgba(26, 28, 44, 0.18);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+}
+
+body {
+  background: var(--ground);
+  color: var(--ink);
+  font-family: var(--serif);
+  font-size: 16px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  overscroll-behavior: none;
+}
+
+h1,
+h2,
+h3,
+h4,
+button,
+input,
+select,
+label,
+.mono,
+table,
+code,
+kbd {
+  font-family: var(--mono);
+}
+
+a {
+  color: var(--accent-cool);
+}
+
+button {
+  font-family: var(--mono);
+  cursor: pointer;
+  border: 0;
+  background: none;
+  color: inherit;
+}
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+code {
+  font-size: 0.9em;
+  background: var(--surface-2);
+  padding: 1px 5px;
+}
+
+/* ── Logo: ısırılmış 4×4 ızgara ─────────────────────────────── */
+.mark {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 2px;
+  width: 26px;
+  height: 26px;
+  flex: none;
+}
+.mark i {
+  background: var(--ink);
+  display: block;
+}
+.mark i.bite {
+  background: transparent;
+  box-shadow: inset 0 0 0 1.5px var(--accent);
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--mono);
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  font-size: 14px;
+  text-decoration: none;
+  color: var(--ink);
+}
+
+/* ── Editör kabuğu ──────────────────────────────────────────── */
+.app {
+  display: flex;
+  flex-direction: column;
+  height: 100dvh;
+  overflow: hidden;
+}
+
+.topbar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--line);
+  background: var(--surface);
+  flex: none;
+  flex-wrap: wrap;
+}
+
+.main {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+  /* güvenlik ağı: bir çocuk sığmazsa durum çubuğunun üstüne binmesin */
+  overflow: hidden;
+}
+
+.stage-wrap {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  background: var(--ground);
+  touch-action: none;
+}
+
+.side {
+  width: 236px;
+  flex: none;
+  border-left: 1px solid var(--line);
+  background: var(--surface);
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+/* palet + araç ayarları kayar; katman paneli altta sabit kalır */
+.side-scroll {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+}
+.side > .panel {
+  flex: none;
+  max-height: 46%;
+  overflow-y: auto;
+  border-bottom: 0;
+  border-top: 1px solid var(--line);
+}
+
+.rail {
+  width: 48px;
+  flex: none;
+  border-right: 1px solid var(--line);
+  background: var(--surface);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 8px 0;
+  overflow-y: auto;
+}
+
+.bottom {
+  flex: none;
+  border-top: 1px solid var(--line);
+  background: var(--surface);
+}
+
+/* ── Kontroller ─────────────────────────────────────────────── */
+.btn {
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 7px 11px;
+  background: var(--surface-2);
+  border: 1px solid var(--line);
+  color: var(--ink);
+  white-space: nowrap;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.btn:hover:not(:disabled) {
+  border-color: var(--muted);
+}
+.btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+.btn.primary {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #1a1c2c;
+  font-weight: 700;
+}
+.btn.ghost {
+  background: transparent;
+}
+.btn.sm {
+  padding: 4px 8px;
+  font-size: 10px;
+}
+.btn.active {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.tool {
+  width: 36px;
+  height: 36px;
+  display: grid;
+  place-items: center;
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--muted);
+  position: relative;
+}
+.tool:hover {
+  color: var(--ink);
+  background: var(--surface-2);
+}
+.tool[aria-pressed="true"] {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #1a1c2c;
+}
+.tool .kbd {
+  position: absolute;
+  right: 2px;
+  bottom: 1px;
+  font-size: 8px;
+  opacity: 0.55;
+  font-family: var(--mono);
+}
+
+.seg {
+  display: flex;
+  border: 1px solid var(--line);
+}
+.seg button {
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  padding: 6px 9px;
+  color: var(--muted);
+  border-right: 1px solid var(--line);
+  background: transparent;
+}
+.seg button:last-child {
+  border-right: 0;
+}
+.seg button[aria-pressed="true"] {
+  background: var(--accent);
+  color: #1a1c2c;
+  font-weight: 700;
+}
+
+.panel {
+  padding: 12px;
+  border-bottom: 1px solid var(--line);
+}
+.panel h3 {
+  font-size: 10px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--dim);
+  margin: 0 0 10px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.panel h3 .grow {
+  flex: 1;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.row + .row {
+  margin-top: 8px;
+}
+
+label.field {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 11px;
+  color: var(--muted);
+  letter-spacing: 0.04em;
+}
+label.field input[type="range"] {
+  flex: 1;
+  min-width: 0;
+  accent-color: var(--accent);
+}
+label.field input[type="checkbox"] {
+  accent-color: var(--accent);
+}
+
+input[type="text"],
+input[type="number"],
+select {
+  background: var(--ground-2);
+  border: 1px solid var(--line);
+  color: var(--ink);
+  font-size: 11px;
+  padding: 5px 7px;
+  font-family: var(--mono);
+  min-width: 0;
+}
+
+/* ── Palet ──────────────────────────────────────────────────── */
+.swatches {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+.ramp {
+  display: flex;
+  gap: 3px;
+  flex-wrap: wrap;
+}
+/**
+ * Sabit boy: `flex:1` verirsek 4 renkli bir rampa paneli baştan sona kaplıyor
+ * ve altındaki Araç/Katman panelleri ekran dışına itiliyordu.
+ */
+.sw {
+  flex: 0 0 26px;
+  height: 26px;
+  border: 1px solid rgba(0, 0, 0, 0.35);
+  padding: 0;
+  position: relative;
+}
+.sw[aria-pressed="true"]::after {
+  content: "";
+  position: absolute;
+  inset: -2px;
+  border: 2px solid var(--ink);
+  pointer-events: none;
+}
+
+.colorpair {
+  position: relative;
+  width: 46px;
+  height: 46px;
+  flex: none;
+}
+.colorpair i {
+  position: absolute;
+  width: 30px;
+  height: 30px;
+  border: 1px solid var(--line);
+  display: block;
+}
+.colorpair i.p {
+  left: 0;
+  top: 0;
+  z-index: 2;
+}
+.colorpair i.s {
+  right: 0;
+  bottom: 0;
+}
+
+/* ── Zaman şeridi ───────────────────────────────────────────── */
+.timeline {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 12px;
+  overflow-x: auto;
+}
+.frames {
+  display: flex;
+  gap: 6px;
+  align-items: flex-end;
+}
+.frame-cell {
+  position: relative;
+  border: 1px solid var(--line);
+  background: var(--ground-2);
+  padding: 0;
+  display: block;
+  flex: none;
+  line-height: 0;
+}
+.frame-cell canvas {
+  display: block;
+  image-rendering: pixelated;
+}
+.frame-cell[aria-pressed="true"] {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 1px var(--accent);
+}
+.frame-cell .n {
+  position: absolute;
+  left: 2px;
+  bottom: 1px;
+  font-size: 9px;
+  font-family: var(--mono);
+  line-height: 1.4;
+  color: #f4f4f4;
+  background: rgba(20, 22, 31, 0.72);
+  padding: 0 3px;
+}
+
+/* ── Katmanlar ──────────────────────────────────────────────── */
+.layer-list {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.layer {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 6px;
+  border: 1px solid transparent;
+  font-size: 11px;
+  font-family: var(--mono);
+  width: 100%;
+}
+.layer[data-active="true"] {
+  background: var(--surface-2);
+  border-color: var(--accent);
+}
+.layer .nm {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  text-align: left;
+  font-size: 11px;
+  padding: 3px 2px;
+  color: inherit;
+}
+.layer .nm .tagoff {
+  color: var(--dim);
+}
+.layer input.rename {
+  flex: 1;
+  min-width: 0;
+  font-size: 11px;
+  padding: 2px 4px;
+}
+.icon-btn {
+  display: grid;
+  place-items: center;
+  padding: 3px;
+  color: var(--muted);
+  border: 1px solid transparent;
+  flex: none;
+}
+.icon-btn:hover {
+  color: var(--ink);
+  border-color: var(--line);
+}
+.icon-btn[aria-pressed="false"] {
+  opacity: 0.35;
+}
+
+/* ── Ajan şeridi ────────────────────────────────────────────── */
+.agent-ticker {
+  border-top: 1px solid var(--line);
+  background: var(--ground-2);
+  padding: 5px 12px;
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--muted);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 30px;
+  flex: none;
+}
+.agent-ticker .dot {
+  width: 7px;
+  height: 7px;
+  background: var(--dim);
+  flex: none;
+}
+.agent-ticker.live .dot {
+  background: var(--cyan);
+  animation: pulse 1.4s steps(2) infinite;
+}
+@keyframes pulse {
+  50% {
+    opacity: 0.25;
+  }
+}
+.agent-ticker .msg {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.agent-ticker .live-tag {
+  color: var(--cyan);
+  letter-spacing: 0.1em;
+  flex: none;
+}
+
+/* ── Diyalog ────────────────────────────────────────────────── */
+.scrim {
+  position: fixed;
+  inset: 0;
+  background: rgba(10, 11, 16, 0.72);
+  display: grid;
+  place-items: center;
+  z-index: 60;
+  padding: 20px;
+}
+.dialog {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  width: min(660px, 100%);
+  max-height: 88vh;
+  overflow-y: auto;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
+}
+.dialog header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--line);
+  font-family: var(--mono);
+  font-size: 12px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  position: sticky;
+  top: 0;
+  background: var(--surface);
+}
+.dialog .body {
+  padding: 16px;
+}
+.dialog .foot {
+  padding: 12px 16px;
+  border-top: 1px solid var(--line);
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+}
+
+.drop {
+  border: 2px dashed var(--line);
+  background: var(--ground-2);
+  min-height: 190px;
+  display: grid;
+  place-items: center;
+  padding: 16px;
+  cursor: pointer;
+  text-align: center;
+}
+.drop.over {
+  border-color: var(--accent);
+}
+.drop img,
+.drop canvas {
+  max-width: 100%;
+  max-height: 210px;
+  display: block;
+}
+.drop canvas {
+  image-rendering: pixelated;
+}
+.drop p {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--muted);
+  margin: 0;
+  line-height: 1.7;
+  white-space: pre-line;
+}
+
+.toast {
+  position: fixed;
+  left: 50%;
+  bottom: 26px;
+  transform: translateX(-50%);
+  background: var(--surface-2);
+  border: 1px solid var(--accent);
+  color: var(--ink);
+  font-family: var(--mono);
+  font-size: 12px;
+  padding: 9px 16px;
+  z-index: 80;
+  max-width: 90vw;
+}
+
+.hint {
+  font-size: 11px;
+  color: var(--dim);
+  font-family: var(--mono);
+  line-height: 1.6;
+}
+
+pre.code {
+  font-family: var(--mono);
+  font-size: 11.5px;
+  line-height: 1.7;
+  background: var(--ground-2);
+  border: 1px solid var(--line);
+  padding: 12px 14px;
+  overflow-x: auto;
+  margin: 0;
+  white-space: pre-wrap;
+}
+
+.grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+/* ── Tanıtım sayfası ────────────────────────────────────────── */
+.wrap {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+.card {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  padding: 22px;
+}
+/* .card dışında da kullanılıyor (örnek galerisi başlığı) */
+.tag {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  color: var(--accent);
+  display: block;
+  margin-bottom: 10px;
+}
+.card h3 {
+  font-size: 15px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  margin: 0 0 8px;
+}
+.card p {
+  margin: 0;
+  font-size: 15px;
+  color: var(--muted);
+  line-height: 1.7;
+}
+
+/* ── Panel başlığı altındaki açıklama ───────────────────────── */
+.panel .lead {
+  margin: -4px 0 10px;
+  font-size: 11px;
+  line-height: 1.6;
+  color: var(--muted);
+  font-family: var(--mono);
+}
+
+.num {
+  width: 34px;
+  text-align: right;
+  font-size: 11px;
+  flex: none;
+}
+
+.vrule {
+  width: 1px;
+  align-self: stretch;
+  background: var(--line);
+  flex: none;
+}
+
+.btn.danger,
+.btn.primary.danger {
+  background: var(--crim);
+  border-color: var(--crim);
+  color: #fff;
+  font-weight: 700;
+}
+
+/* ── Durum çubuğu ───────────────────────────────────────────── */
+.statusbar {
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 4px 12px;
+  border-top: 1px solid var(--line);
+  background: var(--ground-2);
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--muted);
+  min-height: 26px;
+  overflow-x: auto;
+  white-space: nowrap;
+}
+.statusbar b {
+  color: var(--ink);
+  font-weight: 400;
+}
+.statusbar .pos {
+  min-width: 66px;
+  color: var(--ink);
+}
+.statusbar .tip {
+  color: var(--dim);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 46ch;
+}
+.linkish {
+  color: var(--accent-cool);
+  font-family: var(--mono);
+  font-size: 11px;
+  text-decoration: underline dotted;
+  text-underline-offset: 3px;
+  padding: 0;
+}
+
+/* ── Fırça izi + boş tuval yönlendirmesi ────────────────────── */
+.brush-cursor {
+  position: absolute;
+  pointer-events: none;
+  box-shadow:
+    0 0 0 1px rgba(20, 22, 31, 0.85),
+    inset 0 0 0 1px rgba(244, 244, 244, 0.9);
+  z-index: 4;
+}
+.empty-hint {
+  position: absolute;
+  left: 50%;
+  bottom: 18px;
+  transform: translateX(-50%);
+  max-width: min(460px, 88%);
+  text-align: center;
+  pointer-events: none;
+  font-family: var(--mono);
+  font-size: 12px;
+  line-height: 1.7;
+  color: var(--muted);
+  background: color-mix(in srgb, var(--ground) 86%, transparent);
+  border: 1px dashed var(--line);
+  padding: 10px 16px;
+}
+.empty-hint p {
+  margin: 0;
+}
+.empty-hint .sub {
+  color: var(--dim);
+  margin-top: 4px;
+}
+
+/* ── Seçim: yürüyen karıncalar ──────────────────────────────── */
+/**
+ * İki katmanlı kesikli çerçeve: biri koyu, biri açık, biri ters fazda.
+ * Tek renk kesikli çizgi hem koyu hem açık pikselin üstünde kayboluyor;
+ * ikisi birlikte her zeminde görünür. Hareket `background-position` ile —
+ * transform kullanmıyoruz ki alt katmandaki canvas yeniden boyanmasın.
+ */
+.marquee {
+  position: absolute;
+  pointer-events: none;
+  z-index: 6;
+  /* dört kenar × (koyu + 4px kaydırılmış açık) = 8 katman */
+  background-image:
+    repeating-linear-gradient(90deg, #14161f 0 4px, transparent 4px 8px),
+    repeating-linear-gradient(90deg, #f4f4f4 0 4px, transparent 4px 8px),
+    repeating-linear-gradient(90deg, #14161f 0 4px, transparent 4px 8px),
+    repeating-linear-gradient(90deg, #f4f4f4 0 4px, transparent 4px 8px),
+    repeating-linear-gradient(180deg, #14161f 0 4px, transparent 4px 8px),
+    repeating-linear-gradient(180deg, #f4f4f4 0 4px, transparent 4px 8px),
+    repeating-linear-gradient(180deg, #14161f 0 4px, transparent 4px 8px),
+    repeating-linear-gradient(180deg, #f4f4f4 0 4px, transparent 4px 8px);
+  background-size:
+    100% 1px, 100% 1px,
+    100% 1px, 100% 1px,
+    1px 100%, 1px 100%,
+    1px 100%, 1px 100%;
+  background-position:
+    0 0, 4px 0,
+    0 100%, 4px 100%,
+    0 0, 0 4px,
+    100% 0, 100% 4px;
+  background-repeat: no-repeat;
+  animation: marquee 0.7s linear infinite;
+}
+.marquee.drawing {
+  animation: none;
+  outline: 1px dashed var(--accent);
+  outline-offset: -1px;
+  background: color-mix(in srgb, var(--accent) 10%, transparent);
+}
+@keyframes marquee {
+  to {
+    background-position:
+      8px 0, 12px 0,
+      8px 100%, 12px 100%,
+      0 8px, 0 12px,
+      100% 8px, 100% 12px;
+  }
+}
+
+/* ── Palet düzenleme ────────────────────────────────────────── */
+.sw-edit {
+  position: relative;
+  display: block;
+  flex: 0 0 26px;
+  height: 26px;
+}
+.sw-edit .sw {
+  width: 100%;
+  height: 100%;
+  flex: none;
+}
+.sw-edit .rm {
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  width: 14px;
+  height: 14px;
+  line-height: 12px;
+  text-align: center;
+  font-size: 12px;
+  font-family: var(--mono);
+  background: var(--crim);
+  color: #fff;
+  border: 1px solid var(--ground);
+  padding: 0;
+  opacity: 0;
+}
+.sw-edit:hover .rm,
+.sw-edit .rm:focus-visible {
+  opacity: 1;
+}
+.sw-edit .rm:disabled {
+  display: none;
+}
+
+/* ── İskelet (rig) ──────────────────────────────────────────── */
+.rail-sep {
+  width: 24px;
+  height: 1px;
+  background: var(--line);
+  margin: 5px 0;
+  flex: none;
+}
+
+/**
+ * Katman SVG: ölçekli viewBox yerine ekran koordinatları kullanıyor, böylece
+ * kemik çizgisi 20× yakınlaştırmada da 1.5px kalıyor — tuval hücresi kadar
+ * kalınlaşmıyor.
+ */
+.rig-overlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 5;
+  overflow: visible;
+}
+.rig-bone {
+  stroke: var(--cyan);
+  stroke-width: 1.5;
+  stroke-linecap: round;
+  opacity: 0.75;
+}
+.rig-region {
+  fill: color-mix(in srgb, var(--cyan) 8%, transparent);
+  stroke: var(--cyan);
+  stroke-width: 1;
+  stroke-dasharray: 3 3;
+  opacity: 0.6;
+}
+.rig-handle {
+  fill: color-mix(in srgb, var(--cyan) 45%, transparent);
+  stroke: #14161f;
+  stroke-width: 1;
+}
+.rig-label {
+  font-family: var(--mono);
+  font-size: 10px;
+  fill: var(--cyan);
+  paint-order: stroke;
+  stroke: rgba(20, 22, 31, 0.85);
+  stroke-width: 3;
+  stroke-linejoin: round;
+}
+.rig-node.on .rig-handle {
+  fill: var(--accent);
+  stroke: #14161f;
+  stroke-width: 1.5;
+}
+.rig-node.on .rig-region {
+  stroke: var(--accent);
+  opacity: 1;
+  fill: color-mix(in srgb, var(--accent) 10%, transparent);
+}
+.rig-node.on .rig-label {
+  fill: var(--accent);
+}
+.rig-preview {
+  fill: color-mix(in srgb, var(--accent) 14%, transparent);
+  stroke: var(--accent);
+  stroke-width: 1;
+  stroke-dasharray: 2 2;
+}
+
+.rig-banner {
+  position: absolute;
+  left: 50%;
+  top: 10px;
+  transform: translateX(-50%);
+  margin: 0;
+  max-width: min(520px, 90%);
+  text-align: center;
+  pointer-events: none;
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--cyan);
+  background: color-mix(in srgb, var(--ground) 88%, transparent);
+  border: 1px solid color-mix(in srgb, var(--cyan) 45%, transparent);
+  padding: 5px 12px;
+  z-index: 6;
+}
+
+.panel.rig h4.section {
+  margin-top: 16px;
+  border-top: 1px solid var(--line);
+  padding-top: 10px;
+}
+
+.rig-ghost {
+  stroke-width: 1;
+  fill: none;
+}
+/* onion skin ile aynı dil: geçmiş kırmızı, gelecek mavi */
+.rig-ghost.past {
+  stroke: color-mix(in srgb, var(--crim) 70%, transparent);
+}
+.rig-ghost.future {
+  stroke: color-mix(in srgb, var(--blue) 70%, transparent);
+}
+
+/* ── Ajanın ikinci imleci ───────────────────────────────────── */
+.agent-cursor {
+  position: absolute;
+  pointer-events: none;
+  z-index: 7;
+  box-shadow:
+    0 0 0 1.5px var(--cyan),
+    0 0 0 3px rgba(20, 22, 31, 0.75);
+}
+.agent-cursor span {
+  position: absolute;
+  left: 100%;
+  bottom: 100%;
+  margin: 0 0 2px 3px;
+  white-space: nowrap;
+  font-family: var(--mono);
+  font-size: 10px;
+  line-height: 1.5;
+  color: #14161f;
+  background: var(--cyan);
+  padding: 0 4px;
+}
+
+/* ── Sürükle-sırala geri bildirimi ──────────────────────────── */
+[data-drag="source"] {
+  opacity: 0.4;
+}
+[data-drag="target"] {
+  outline: 2px solid var(--accent);
+  outline-offset: -1px;
+}
+.hint.warn {
+  color: var(--gold);
+}
+
+/* ── Odak modu ──────────────────────────────────────────────── */
+.app.focus .stage-wrap {
+  background: var(--ground-2);
+}
+.floating-palette {
+  position: absolute;
+  left: 50%;
+  bottom: 16px;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 8px;
+  background: color-mix(in srgb, var(--surface) 92%, transparent);
+  border: 1px solid var(--line);
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.35);
+  z-index: 20;
+  max-width: min(760px, 92vw);
+}
+.floating-palette .pair {
+  position: relative;
+  width: 26px;
+  height: 26px;
+  flex: none;
+  padding: 0;
+}
+.floating-palette .pair i {
+  position: absolute;
+  width: 17px;
+  height: 17px;
+  border: 1px solid var(--line);
+  display: block;
+}
+.floating-palette .pair i:first-child {
+  left: 0;
+  top: 0;
+  z-index: 2;
+}
+.floating-palette .pair i:last-child {
+  right: 0;
+  bottom: 0;
+}
+.floating-palette .strip {
+  display: flex;
+  gap: 2px;
+  flex-wrap: wrap;
+  min-width: 0;
+}
+.floating-palette .strip button {
+  width: 22px;
+  height: 22px;
+  border: 1px solid rgba(0, 0, 0, 0.35);
+  padding: 0;
+  position: relative;
+}
+.floating-palette .strip button[aria-pressed="true"]::after {
+  content: "";
+  position: absolute;
+  inset: -2px;
+  border: 2px solid var(--ink);
+}
+
+/* ── Animasyon görünümü ─────────────────────────────────────── */
+.bottom.animate .frames {
+  gap: 10px;
+  padding: 4px 0;
+}
+.bottom.animate .frame-cell {
+  padding-bottom: 14px;
+}
+.frame-cell .cs {
+  position: absolute;
+  right: 2px;
+  bottom: 1px;
+  font-size: 9px;
+  font-family: var(--mono);
+  line-height: 1.4;
+  color: var(--muted);
+  background: rgba(20, 22, 31, 0.72);
+  padding: 0 3px;
+}
+
+/* ── Ajan şeridi ek durumları ───────────────────────────────── */
+.agent-ticker.asking {
+  background: color-mix(in srgb, var(--gold) 14%, var(--ground-2));
+  border-top-color: var(--gold);
+  color: var(--ink);
+}
+.agent-ticker.asking .dot {
+  background: var(--gold);
+}
+.agent-ticker .msg.denied {
+  color: var(--crim);
+}
+
+/* ── İzin listesi ───────────────────────────────────────────── */
+.perms {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.perm {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 8px 10px;
+  border: 1px solid var(--line);
+  cursor: pointer;
+}
+.perm:hover {
+  border-color: var(--muted);
+}
+.perm.risky {
+  border-left: 3px solid var(--gold);
+}
+.perm input {
+  margin-top: 3px;
+  accent-color: var(--accent);
+  flex: none;
+}
+.perm-body {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+.perm-body b {
+  font-family: var(--mono);
+  font-size: 12px;
+  letter-spacing: 0.04em;
+}
+
+/* ── Diyalog içi tipografi ──────────────────────────────────── */
+.dialog.wide {
+  width: min(760px, 100%);
+}
+h4.section {
+  font-size: 10px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--dim);
+  margin: 22px 0 8px;
+  font-weight: 700;
+}
+.bullets {
+  margin: 0;
+  padding-left: 20px;
+  font-size: 13px;
+  line-height: 1.8;
+  color: var(--muted);
+}
+.bullets li + li {
+  margin-top: 4px;
+}
+.bullets.numbered {
+  list-style: decimal;
+}
+
+.tool-help {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.tool-help-row {
+  display: grid;
+  grid-template-columns: 26px 130px 1fr;
+  gap: 10px;
+  align-items: baseline;
+  padding: 5px 0;
+  border-bottom: 1px solid var(--line);
+}
+.tool-help-row .ic {
+  color: var(--accent);
+  justify-self: center;
+  position: relative;
+  top: 2px;
+}
+.tool-help-row b {
+  font-family: var(--mono);
+  font-size: 12px;
+}
+
+.keys {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  gap: 2px 18px;
+}
+.keyrow {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  padding: 3px 0;
+}
+kbd {
+  font-family: var(--mono);
+  font-size: 10.5px;
+  background: var(--surface-2);
+  border: 1px solid var(--line);
+  border-bottom-width: 2px;
+  padding: 1px 6px;
+  white-space: nowrap;
+  flex: none;
+  min-width: 34px;
+  text-align: center;
+}
+
+.faq {
+  margin: 0;
+}
+.faq dt {
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--ink);
+  margin-top: 10px;
+}
+.faq dd {
+  margin: 2px 0 0;
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.7;
+}
+
+/* ── İlk kullanım rehberi ───────────────────────────────────── */
+.tour {
+  border: 1px solid var(--line);
+  background: var(--ground-2);
+  padding: 20px;
+  margin-top: 12px;
+  min-height: 150px;
+}
+.tour-n {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  color: var(--accent);
+}
+.tour h3 {
+  margin: 8px 0 8px;
+  font-size: 16px;
+  letter-spacing: 0.02em;
+}
+.tour p {
+  margin: 0;
+  font-size: 14px;
+  color: var(--muted);
+  line-height: 1.8;
+}
+.tour-dots {
+  display: flex;
+  gap: 6px;
+  justify-content: center;
+  margin-top: 12px;
+}
+.tour-dots i {
+  width: 18px;
+  height: 4px;
+  background: var(--line);
+  display: block;
+}
+.tour-dots i.on {
+  background: var(--accent);
+}
+
+.draft-row {
+  border: 1px solid var(--line);
+  padding: 7px 9px;
+}
+
+/* ── Duyarlı düzen ──────────────────────────────────────────── */
+@media (max-width: 1100px) {
+  .side {
+    width: 208px;
+  }
+}
+@media (max-width: 820px) {
+  .main {
+    flex-direction: column;
+  }
+  .rail {
+    width: 100%;
+    flex-direction: row;
+    border-right: 0;
+    border-bottom: 1px solid var(--line);
+    padding: 4px 6px;
+    order: -1;
+    /* yatay rayda dikey kaydırma anlamsız */
+    overflow-x: auto;
+    overflow-y: hidden;
+  }
+  /* dokunmatikte klavye kısayolu etiketi sadece ikonu kirletiyor */
+  .rail .tool .kbd {
+    display: none;
+  }
+  /**
+   * Telefonda sağ kolon TEK kaydırma sütunu.
+   * Masaüstündeki "katmanlar altta sabit" düzeni burada çalışmıyor: `.side`
+   * yüksekliği max-height ile belirsiz kalıyor, çocukların yüzdeli
+   * max-height'ı çözülemiyor ve içerik durum çubuğunun altına taşıyordu.
+   */
+  /**
+   * Dikey bütçe vh DEĞİL yüzde ile kuruluyor.
+   * vh kullanınca üst bar + ray + durum çubuğu + şerit + ajan şeridi toplamı
+   * hesaba girmiyordu ve `.main` sıkışırken çocukları sığmayıp durum
+   * çubuğunun üstüne biniyordu. Yüzde `.main`'in kesinleşmiş yüksekliğine
+   * göre çözülüyor, taşma imkânsız.
+   */
+  .side {
+    width: 100%;
+    border-left: 0;
+    border-top: 1px solid var(--line);
+    flex: 0 0 auto;
+    max-height: 55%;
+    overflow-y: auto;
+  }
+  .side-scroll {
+    flex: none;
+    overflow: visible;
+  }
+  .side > .panel {
+    max-height: none;
+    overflow: visible;
+  }
+  .stage-wrap {
+    min-height: 30%;
+  }
+  .statusbar .tip {
+    display: none;
+  }
+  .topbar {
+    gap: 6px;
+  }
+}
+
+/* ── Tanıtım / doküman sayfaları ────────────────────────────── */
+.site-head {
+  border-bottom: 1px solid var(--line);
+  background: var(--surface);
+}
+.site-foot {
+  border-top: 1px solid var(--line);
+  padding: 26px 0 50px;
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--dim);
+}
+.head-inner {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding-top: 14px;
+  padding-bottom: 14px;
+  flex-wrap: wrap;
+}
+.site-foot .head-inner {
+  padding: 0;
+}
+.wordmark {
+  font-family: var(--mono);
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  font-size: 15px;
+}
+.head-link {
+  font-family: var(--mono);
+  font-size: 12px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--muted);
+  text-decoration: none;
+}
+.head-link:hover {
+  color: var(--accent);
+}
+
+.hero {
+  padding: 72px 24px 60px;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 48px;
+  align-items: center;
+}
+.hero-title {
+  font-family: var(--mono);
+  font-size: clamp(28px, 5.2vw, 54px);
+  letter-spacing: -0.03em;
+  line-height: 1.05;
+  margin: 0 0 20px;
+  text-wrap: balance;
+}
+.hero-lede {
+  font-size: 18px;
+  color: var(--muted);
+  max-width: 58ch;
+  margin: 0 0 30px;
+  font-family: var(--serif);
+  line-height: 1.7;
+}
+.cta {
+  font-size: 13px;
+  padding: 14px 24px;
+  text-decoration: none;
+}
+.bulletrow {
+  display: flex;
+  gap: 8px 22px;
+  flex-wrap: wrap;
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--muted);
+  margin-top: 26px;
+}
+
+/**
+ * Sprite = CSS ızgarası, her piksel bir hücre.
+ * Genişlik ve satır/kolon oranı bileşenden inline geliyor (sprite'a göre
+ * değişiyor), burada sadece ızgara davranışı var.
+ */
+/**
+ * Hücreler arasındaki 2px boşluk küçük sprite'larda kasıtlı: "bunlar piksel"
+ * hissini veriyor. Sahnelerde ise 56 hücre yan yana geldiğinde boşluk resmin
+ * beşte birini yiyor, arkadaki dama sızıyor ve renkler açılıyor — resim mozaik
+ * gibi okunuyordu. O yüzden `fit` (sahne) modunda boşluk yok.
+ */
+.pixel-sprite {
+  display: grid;
+  gap: 2px;
+  flex: none;
+}
+.pixel-sprite.fit {
+  gap: 0;
+}
+.pixel-sprite i {
+  display: block;
+  aspect-ratio: 1;
+}
+.hero-sprite {
+  align-self: center;
+}
+
+/* ── Örnek galerisi ─────────────────────────────────────────── */
+.showcase {
+  padding: 56px 24px 8px;
+}
+.showcase-title {
+  font-family: var(--mono);
+  font-size: clamp(20px, 3vw, 30px);
+  letter-spacing: -0.01em;
+  margin: 8px 0 16px;
+  text-wrap: balance;
+}
+.showcase-sub {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--dim);
+  margin: 30px 0 0;
+  font-weight: 700;
+}
+/**
+ * Sahneler 56 piksel geniş — iki sütuna sıkıştırınca piksel başına 6px kalıyor
+ * ve detay (fener, çit, köpeğin gözleri) okunmuyordu. Her sahne kendi satırını
+ * alıyor; 720px sınırı piksellerin ~13px'te kalmasını sağlıyor, daha genişte
+ * sprite ekranı yiyor.
+ */
+.scene-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 22px;
+  margin-top: 14px;
+}
+.showcase-item.scene {
+  max-width: 760px;
+  width: 100%;
+  margin-inline: auto;
+}
+.showcase-item.scene .sprite-box {
+  height: auto;
+  padding: 14px;
+}
+.showcase-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 18px;
+  margin-top: 14px;
+}
+.showcase-item {
+  margin: 0;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  padding: 18px 16px 14px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+/**
+ * Sabit yükseklikli sprite alanı: kalp 9, kılıç 16 satır. Kutu olmadan
+ * kartlar farklı yükseklikte kalıyor ve alt yazılar hizasız duruyordu.
+ *
+ * Zemin saydamlık daması — editördeki tuvalin aynısı. İki işi birden yapıyor:
+ * sprite'ların koyu dış hattı (#1a1c2c) kart zeminiyle neredeyse aynı değerde
+ * olduğu için kayboluyordu, dama kontrastı veriyor; ve "bu bir pixel art
+ * varlığı" görsel dilini sayfaya taşıyor.
+ */
+.showcase-item .sprite-box {
+  height: 204px;
+  width: 100%;
+  display: grid;
+  place-items: center;
+  background-color: var(--ground-2);
+  background-image:
+    linear-gradient(45deg, rgba(148, 176, 194, 0.13) 25%, transparent 25%, transparent 75%, rgba(148, 176, 194, 0.13) 75%),
+    linear-gradient(45deg, rgba(148, 176, 194, 0.13) 25%, transparent 25%, transparent 75%, rgba(148, 176, 194, 0.13) 75%);
+  background-size: 16px 16px;
+  background-position: 0 0, 8px 8px;
+  border: 1px solid var(--line);
+}
+.showcase-item figcaption {
+  font-family: var(--mono);
+  font-size: 11px;
+  line-height: 1.6;
+  color: var(--muted);
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.showcase-item .frames {
+  color: var(--accent);
+  letter-spacing: 0.08em;
+}
+
+.palette-strip {
+  display: flex;
+  height: 8px;
+}
+.palette-strip.thin {
+  height: 5px;
+  margin: 26px 0 8px;
+}
+.palette-strip i {
+  flex: 1;
+  display: block;
+}
+
+.features {
+  padding: 60px 24px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 18px;
+}
+
+.doc {
+  padding: 48px 24px 72px;
+  max-width: 860px;
+}
+.doc-title {
+  font-family: var(--mono);
+  font-size: clamp(26px, 4vw, 40px);
+  letter-spacing: -0.02em;
+  margin: 0 0 16px;
+}
+.doc-h2 {
+  font-family: var(--mono);
+  font-size: 13px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin: 40px 0 12px;
+  padding-top: 14px;
+  border-top: 1px solid var(--line);
+}
+.ref {
+  display: flex;
+  flex-direction: column;
+}
+.refrow {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 3px;
+  padding: 9px 0;
+  border-bottom: 1px solid var(--line);
+}
+.refrow code {
+  background: none;
+  padding: 0;
+  color: var(--ink);
+  font-size: 12px;
+  overflow-wrap: anywhere;
+}
+@media (min-width: 720px) {
+  .refrow {
+    grid-template-columns: minmax(0, 24em) minmax(0, 1fr);
+    gap: 18px;
+    align-items: baseline;
+  }
+}
+@media (max-width: 760px) {
+  .hero {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 28px;
+    padding-top: 44px;
+  }
+  .hero-sprite {
+    width: min(220px, 60vw);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation: none !important;
+    transition: none !important;
+  }
+}

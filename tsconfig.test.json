@@ -1,0 +1,22 @@
+{
+  // Testler için ayrı derleme.
+  //
+  // Neden derleyip çalıştırıyoruz, Node'a doğrudan .ts vermiyoruz: Node 25
+  // TypeScript'i strip edebiliyor ama modül çözümlemesi ESM kurallarında
+  // kalıyor, yani `from "./raster"` gibi uzantısız importları bulamıyor.
+  // Kaynağa `.ts` uzantıları serpmek yerine CommonJS'e derliyoruz —
+  // require() uzantısız yolu sorunsuz çözüyor. Sıfır yeni bağımlılık.
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "noEmit": false,
+    "outDir": "test-build",
+    "incremental": false,
+    "jsx": "react-jsx",
+    "types": ["node"],
+    "plugins": []
+  },
+  "include": ["src/lib/**/*.ts", "src/types/**/*.ts"],
+  "exclude": ["node_modules"]
+}

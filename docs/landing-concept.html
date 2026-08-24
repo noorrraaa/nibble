@@ -1,0 +1,1323 @@
+<title>Nibble</title>
+<style>
+  /* ─────────────────────────────────────────────────────────
+     NIBBLE — palet: Sweetie-16 türevi (gerçek bir pixel art paleti)
+     Dark-first: bare :root koyu, light açıkça yeniden tanımlanıyor
+     ───────────────────────────────────────────────────────── */
+  :root {
+    --ground:    #14161f;
+    --ground-2:  #1a1c2c;
+    --surface:   #21243a;
+    --surface-2: #2b2f4a;
+    --line:      #383d5c;
+    --ink:       #f4f4f4;
+    --muted:     #94b0c2;
+    --dim:       #6a7594;
+
+    --coral:  #ef7d57;
+    --crim:   #b13e53;
+    --gold:   #ffcd75;
+    --blue:   #41a6f6;
+    --cyan:   #73eff7;
+    --green:  #38b764;
+    --plum:   #5d275d;
+
+    --accent:      var(--coral);
+    --accent-cool: var(--blue);
+    --grid-line: rgba(148,176,194,.07);
+    --shadow: 0 2px 0 rgba(0,0,0,.45);
+
+    --mono: ui-monospace, "SF Mono", SFMono-Regular, "JetBrains Mono", Menlo, Consolas, monospace;
+    --serif: "Iowan Old Style", "Palatino Linotype", Palatino, "Book Antiqua", Georgia, serif;
+
+    --px: 4px;
+    --maxw: 1080px;
+  }
+
+  @media (prefers-color-scheme: light) {
+    :root:not([data-theme="dark"]) {
+      --ground:    #e9ebf0;
+      --ground-2:  #f4f5f8;
+      --surface:   #ffffff;
+      --surface-2: #eef0f5;
+      --line:      #c9cfdd;
+      --ink:       #1a1c2c;
+      --muted:     #566c86;
+      --dim:       #8695ac;
+      --coral:  #d9583a;
+      --crim:   #a02f45;
+      --gold:   #c98b1e;
+      --blue:   #1e7fd4;
+      --cyan:   #2b9fb0;
+      --green:  #2a8f4c;
+      --plum:   #6b3070;
+      --grid-line: rgba(26,28,44,.07);
+      --shadow: 0 2px 0 rgba(26,28,44,.18);
+    }
+  }
+  :root[data-theme="light"] {
+    --ground:    #e9ebf0;
+    --ground-2:  #f4f5f8;
+    --surface:   #ffffff;
+    --surface-2: #eef0f5;
+    --line:      #c9cfdd;
+    --ink:       #1a1c2c;
+    --muted:     #566c86;
+    --dim:       #8695ac;
+    --coral:  #d9583a;
+    --crim:   #a02f45;
+    --gold:   #c98b1e;
+    --blue:   #1e7fd4;
+    --cyan:   #2b9fb0;
+    --green:  #2a8f4c;
+    --plum:   #6b3070;
+    --grid-line: rgba(26,28,44,.07);
+    --shadow: 0 2px 0 rgba(26,28,44,.18);
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: var(--ground);
+    color: var(--ink);
+    font-family: var(--serif);
+    font-size: 17px;
+    line-height: 1.65;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .wrap { max-width: var(--maxw); margin: 0 auto; padding: 0 24px; }
+
+  /* ── Tipografi ───────────────────────────────────────── */
+  h1, h2, h3, .mono, .label, code, kbd, button, .btn, table {
+    font-family: var(--mono);
+  }
+  h2 {
+    font-size: clamp(22px, 3.2vw, 30px);
+    letter-spacing: -0.02em;
+    text-transform: uppercase;
+    font-weight: 700;
+    margin: 0 0 6px;
+    text-wrap: balance;
+  }
+  h3 {
+    font-size: 15px;
+    letter-spacing: .04em;
+    text-transform: uppercase;
+    margin: 0 0 8px;
+    font-weight: 700;
+  }
+  p { margin: 0 0 16px; max-width: 66ch; }
+  .lede { font-size: 19px; color: var(--muted); }
+  a { color: var(--accent-cool); }
+
+  .label {
+    font-size: 11px;
+    letter-spacing: .18em;
+    text-transform: uppercase;
+    color: var(--dim);
+    display: block;
+    margin-bottom: 14px;
+  }
+  .label::before {
+    content: "";
+    display: inline-block;
+    width: 6px; height: 6px;
+    background: var(--accent);
+    margin-right: 9px;
+    vertical-align: 1px;
+  }
+
+  section { padding: 68px 0; border-top: 1px solid var(--line); }
+  section:first-of-type { border-top: 0; }
+
+  /* ── Logo işareti: ısırılmış 4×4 ızgara ──────────────── */
+  .mark {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 2px;
+    width: 34px; height: 34px;
+    flex: none;
+  }
+  .mark i { background: var(--ink); display: block; }
+  .mark i.bite { background: transparent; box-shadow: inset 0 0 0 1.5px var(--accent); }
+  .mark.lg { width: 68px; height: 68px; gap: 4px; }
+
+  /* ── Üst bar ─────────────────────────────────────────── */
+  header {
+    position: sticky; top: 0; z-index: 20;
+    background: color-mix(in srgb, var(--ground) 88%, transparent);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--line);
+  }
+  .bar { display: flex; align-items: center; gap: 14px; padding: 14px 0; }
+  .brand { display: flex; align-items: center; gap: 12px; font-family: var(--mono); font-weight: 700; letter-spacing: .2em; font-size: 15px; }
+  .bar nav { margin-left: auto; display: flex; gap: 20px; font-family: var(--mono); font-size: 12px; letter-spacing: .1em; text-transform: uppercase; }
+  .bar nav a { color: var(--muted); text-decoration: none; }
+  .bar nav a:hover { color: var(--ink); }
+  .theme-btn {
+    font-family: var(--mono); font-size: 11px; letter-spacing: .1em;
+    background: transparent; border: 1px solid var(--line); color: var(--muted);
+    padding: 6px 10px; cursor: pointer; text-transform: uppercase;
+  }
+  .theme-btn:hover { color: var(--ink); border-color: var(--muted); }
+
+  /* ── Hero ────────────────────────────────────────────── */
+  .hero {
+    position: relative;
+    padding: 88px 0 72px;
+    background-image:
+      linear-gradient(var(--grid-line) 1px, transparent 1px),
+      linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
+    background-size: 16px 16px;
+  }
+  .hero::after {
+    content: ""; position: absolute; inset: 0; pointer-events: none;
+    background: radial-gradient(ellipse 70% 60% at 30% 20%, transparent 30%, var(--ground) 100%);
+  }
+  .hero > * { position: relative; z-index: 1; }
+
+  #wordmark {
+    display: grid;
+    gap: 2px;
+    width: fit-content;
+    max-width: 100%;
+    margin-bottom: 26px;
+  }
+  #wordmark span { aspect-ratio: 1; }
+  #wordmark span.on { animation: pop .28s steps(2) backwards; }
+  @keyframes pop { from { opacity: 0; transform: scale(.3); } }
+
+  .tagline {
+    font-family: var(--mono);
+    font-size: clamp(17px, 2.4vw, 22px);
+    letter-spacing: -.01em;
+    max-width: 30ch;
+    margin: 0 0 10px;
+    line-height: 1.4;
+    font-weight: 700;
+  }
+  .tagline em { color: var(--accent); font-style: normal; }
+
+  .cta-row { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 30px; align-items: center; }
+  .btn {
+    display: inline-flex; align-items: center; gap: 10px;
+    font-size: 13px; letter-spacing: .1em; text-transform: uppercase; font-weight: 700;
+    padding: 13px 22px;
+    border: 0; cursor: pointer;
+    background: var(--accent); color: #1a1c2c;
+    box-shadow: var(--shadow);
+    text-decoration: none;
+  }
+  .btn:active { transform: translateY(2px); box-shadow: none; }
+  .btn.ghost { background: transparent; color: var(--ink); box-shadow: none; border: 1px solid var(--line); }
+  .btn.ghost:hover { border-color: var(--muted); }
+
+  .freebar {
+    display: flex; flex-wrap: wrap; gap: 8px 22px;
+    font-family: var(--mono); font-size: 12px; color: var(--muted);
+    letter-spacing: .04em; margin-top: 26px;
+  }
+  .freebar span::before { content: "▪ "; color: var(--green); }
+
+  /* ── Sprite kartları ─────────────────────────────────── */
+  .sprite-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 14px;
+    margin-top: 26px;
+  }
+  .sprite-card {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    padding: 18px 14px 12px;
+    display: flex; flex-direction: column; align-items: center; gap: 12px;
+    cursor: pointer;
+    position: relative;
+  }
+  .sprite-card:hover { border-color: var(--accent); }
+  .sprite-card .cap {
+    font-family: var(--mono); font-size: 10px; letter-spacing: .12em;
+    text-transform: uppercase; color: var(--dim);
+  }
+  .pixgrid { display: grid; gap: 0; image-rendering: pixelated; }
+  .pixgrid span { aspect-ratio: 1; }
+
+  .featured {
+    display: grid;
+    grid-template-columns: minmax(200px, 260px) 1fr;
+    gap: 28px;
+    align-items: center;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    padding: 24px;
+    margin-top: 26px;
+  }
+  .featured .stage {
+    display: grid; place-items: center;
+    background: var(--ground-2);
+    border: 1px solid var(--line);
+    padding: 18px;
+    position: relative;
+  }
+  .frame-dots { display: flex; gap: 5px; margin-top: 14px; }
+  .frame-dots i { width: 8px; height: 8px; background: var(--line); display: block; }
+  .frame-dots i.on { background: var(--accent); }
+
+  /* ── Kod / terminal ──────────────────────────────────── */
+  pre, .term {
+    font-family: var(--mono);
+    font-size: 12.5px;
+    line-height: 1.7;
+    background: var(--ground-2);
+    border: 1px solid var(--line);
+    padding: 16px 18px;
+    overflow-x: auto;
+    margin: 0;
+    tab-size: 2;
+  }
+  code.inline {
+    font-size: .88em;
+    background: var(--surface-2);
+    padding: 2px 6px;
+    color: var(--accent-cool);
+  }
+  .term .c-dim { color: var(--dim); }
+  .term .c-you { color: var(--gold); }
+  .term .c-ai  { color: var(--cyan); }
+  .term .c-ok  { color: var(--green); }
+  .term .c-hint { color: var(--coral); }
+
+  .prompt-box {
+    background: var(--surface);
+    border: 1px solid var(--accent);
+    padding: 16px 18px;
+    display: flex; gap: 16px; align-items: flex-start;
+    font-family: var(--mono); font-size: 13px; line-height: 1.6;
+    margin: 18px 0;
+  }
+  .prompt-box p { margin: 0; max-width: none; }
+  .copy-btn {
+    margin-left: auto; flex: none;
+    font-family: var(--mono); font-size: 11px; letter-spacing: .1em; text-transform: uppercase;
+    background: var(--accent); color: #1a1c2c; border: 0; padding: 8px 12px; cursor: pointer;
+  }
+
+  /* ── İki sütun ───────────────────────────────────────── */
+  .cols { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 26px; margin-top: 26px; }
+  .card { background: var(--surface); border: 1px solid var(--line); padding: 22px; }
+  .card p:last-child { margin-bottom: 0; }
+  .card .num {
+    font-family: var(--mono); font-size: 11px; letter-spacing: .1em;
+    color: var(--accent); display: block; margin-bottom: 10px;
+  }
+
+  /* ── Arayüz maketi ───────────────────────────────────── */
+  .mock {
+    background: var(--ground-2);
+    border: 1px solid var(--line);
+    padding: 0;
+    overflow: hidden;
+  }
+  .mock-head {
+    display: flex; align-items: center; gap: 8px;
+    padding: 8px 12px; border-bottom: 1px solid var(--line);
+    font-family: var(--mono); font-size: 10px; letter-spacing: .12em;
+    text-transform: uppercase; color: var(--dim);
+    background: var(--surface);
+  }
+  .mock-head b { color: var(--ink); font-weight: 700; }
+  .mock-body { padding: 22px; min-height: 210px; position: relative;
+    background-image:
+      linear-gradient(var(--grid-line) 1px, transparent 1px),
+      linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
+    background-size: 12px 12px;
+    display: grid; place-items: center;
+  }
+  .cursor-tag {
+    position: absolute;
+    font-family: var(--mono); font-size: 10px; letter-spacing: .08em;
+    padding: 2px 6px; white-space: nowrap;
+  }
+  .cursor-tag.ai   { background: var(--cyan);  color: #1a1c2c; top: 26px; right: 26px; }
+  .cursor-tag.you  { background: var(--gold);  color: #1a1c2c; bottom: 26px; left: 26px; }
+
+  .ramp-strip { display: flex; gap: 3px; position: absolute; left: 22px; top: 22px; }
+  .ramp-strip i { width: 13px; height: 13px; display: block; }
+
+  .filmstrip { display: flex; align-items: center; gap: 10px; justify-content: center; width: 100%; }
+  .filmstrip .cell {
+    border: 1px solid var(--line); background: var(--ground);
+    display: grid; place-items: center;
+    font-family: var(--mono); font-size: 10px; color: var(--dim);
+  }
+  .filmstrip .cell.sm { width: 44px; height: 54px; }
+  .filmstrip .cell.md { width: 62px; height: 74px; opacity: .75; }
+  .filmstrip .cell.lg { width: 118px; height: 140px; border-color: var(--accent); }
+  .filmstrip .cell.lg .pixgrid { transform: scale(1.05); }
+
+  .mock-foot {
+    border-top: 1px solid var(--line); background: var(--surface);
+    padding: 7px 12px; font-family: var(--mono); font-size: 11px; color: var(--muted);
+  }
+  .mock-foot .c-ai { color: var(--cyan); }
+
+  /* ── Boyut vitrini ───────────────────────────────────── */
+  .sizes { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 16px; margin-top: 26px; align-items: end; }
+  .size-card { background: var(--surface); border: 1px solid var(--line); padding: 14px; display: flex; flex-direction: column; align-items: center; gap: 12px; }
+  .size-card canvas { image-rendering: pixelated; width: 100%; height: auto; display: block; border: 1px solid var(--line); }
+  .size-card .cap { font-family: var(--mono); font-size: 10px; letter-spacing: .12em; text-transform: uppercase; color: var(--dim); }
+  .size-card .cap b { color: var(--accent); font-weight: 700; }
+
+  /* ── Dönüştürücü ─────────────────────────────────────── */
+  .conv { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin-top: 24px; }
+  .conv-pane { background: var(--surface); border: 1px solid var(--line); padding: 16px; display: flex; flex-direction: column; gap: 12px; }
+  .conv-pane h3 { margin: 0; color: var(--dim); }
+  .drop {
+    border: 2px dashed var(--line); background: var(--ground-2);
+    min-height: 220px; display: grid; place-items: center; text-align: center;
+    padding: 20px; cursor: pointer; position: relative;
+  }
+  .drop.over { border-color: var(--accent); background: color-mix(in srgb, var(--accent) 10%, var(--ground-2)); }
+  .drop p { font-family: var(--mono); font-size: 12px; color: var(--muted); margin: 0; max-width: 30ch; line-height: 1.6; }
+  .drop img, .drop canvas { max-width: 100%; max-height: 260px; display: block; }
+  .drop canvas { image-rendering: pixelated; width: 100%; height: auto; }
+  .conv-ctl { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-top: 20px; }
+  .conv-ctl .grp { display: flex; border: 1px solid var(--line); }
+  .conv-ctl .grp button {
+    font-family: var(--mono); font-size: 11px; letter-spacing: .06em;
+    background: transparent; border: 0; border-right: 1px solid var(--line);
+    color: var(--muted); padding: 8px 11px; cursor: pointer;
+  }
+  .conv-ctl .grp button:last-child { border-right: 0; }
+  .conv-ctl .grp button[aria-pressed="true"] { background: var(--accent); color: #1a1c2c; font-weight: 700; }
+  .conv-ctl .tag { font-family: var(--mono); font-size: 10px; letter-spacing: .14em; text-transform: uppercase; color: var(--dim); margin-right: 4px; }
+
+  /* ── İskelet (rig) katmanı ───────────────────────────── */
+  .rig-layout {
+    display: grid;
+    grid-template-columns: minmax(260px, 350px) 1fr;
+    gap: 32px; align-items: start; margin-top: 26px;
+  }
+  .rig-panel {
+    background: var(--surface); border: 1px solid var(--line);
+    padding: 22px 18px; display: flex; flex-direction: column; align-items: center; gap: 18px;
+  }
+  .rig-stage { position: relative; line-height: 0; }
+  .rig-stage svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; pointer-events: none; }
+  .rig-bone { stroke: var(--cyan); stroke-width: .3; stroke-linecap: round; opacity: .9; }
+  .rig-node { fill: var(--ground); stroke: var(--gold); stroke-width: .28; }
+  .rig-node.tip { fill: var(--gold); }
+  .rig-tag {
+    position: absolute; left: 100%;
+    transform: translate(9px, -50%);
+    font-family: var(--mono); font-size: 10px; letter-spacing: .04em;
+    color: var(--gold); white-space: nowrap; pointer-events: none;
+  }
+  .rig-tag::before {
+    content: ""; position: absolute; right: 100%; top: 50%;
+    width: 7px; height: 1px; background: var(--gold); opacity: .55;
+  }
+  .rig-tag.left { left: 0; transform: translate(-9px, -50%) translateX(-100%); }
+  .rig-tag.left::before { right: auto; left: 100%; }
+  .rig-ctl { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; }
+  .rig-ctl button {
+    font-family: var(--mono); font-size: 11px; letter-spacing: .06em;
+    background: var(--surface-2); border: 1px solid var(--line); color: var(--ink);
+    padding: 8px 11px; cursor: pointer;
+  }
+  .rig-ctl button:hover { border-color: var(--gold); color: var(--gold); }
+  .rig-legend {
+    font-family: var(--mono); font-size: 11px; color: var(--dim);
+    display: flex; gap: 16px; flex-wrap: wrap; justify-content: center;
+  }
+  .rig-legend b { font-weight: 400; }
+  .rig-legend .k-node::before { content: "◯ "; color: var(--gold); }
+  .rig-legend .k-bone::before { content: "— "; color: var(--cyan); }
+
+  /* ── Tablo ───────────────────────────────────────────── */
+  .tbl-wrap { overflow-x: auto; margin-top: 22px; }
+  table { border-collapse: collapse; width: 100%; font-size: 13px; min-width: 520px; }
+  th, td { text-align: left; padding: 10px 14px; border-bottom: 1px solid var(--line); vertical-align: top; }
+  th { font-size: 10px; letter-spacing: .14em; text-transform: uppercase; color: var(--dim); font-weight: 700; }
+  td:first-child { color: var(--accent); white-space: nowrap; }
+  .done { color: var(--green); }
+
+  /* ── Palet şeridi (bölüm ayracı) ─────────────────────── */
+  .palette-strip { display: flex; height: 8px; margin: 0; }
+  .palette-strip i { flex: 1; display: block; }
+
+  /* ── Footer ──────────────────────────────────────────── */
+  footer { padding: 40px 0 60px; border-top: 1px solid var(--line); }
+  .foot-row { display: flex; flex-wrap: wrap; gap: 18px; align-items: center; font-family: var(--mono); font-size: 12px; color: var(--dim); letter-spacing: .06em; }
+
+  @media (max-width: 700px) {
+    .featured { grid-template-columns: 1fr; }
+    .filmstrip .cell.sm { display: none; }
+    body { font-size: 16px; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    #wordmark span.on { animation: none; }
+    * { transition: none !important; }
+  }
+</style>
+
+<header>
+  <div class="wrap bar">
+    <span class="mark" aria-hidden="true">
+      <i></i><i></i><i></i><i class="bite"></i>
+      <i></i><i></i><i></i><i></i>
+      <i></i><i></i><i></i><i></i>
+      <i></i><i></i><i></i><i></i>
+    </span>
+    <span class="brand">NIBBLE</span>
+    <nav>
+      <a href="#boyutlar">Boyutlar</a>
+      <a href="#donustur">Dönüştürücü</a>
+      <a href="#ai">AI Bağlantısı</a>
+      <a href="#rig">İskelet</a>
+      <a href="#ui">Arayüz</a>
+    </nav>
+    <button class="theme-btn" id="theme" type="button">Tema</button>
+  </div>
+</header>
+
+<div class="hero">
+  <div class="wrap">
+    <div id="wordmark" role="img" aria-label="Nibble"></div>
+
+    <p class="tagline">Pixel çiz, kare kare canlandır — <em>yapay zekâ yanında çizsin.</em></p>
+    <p class="lede">Tarayıcıda çalışan pixel art ve animasyon editörü. Üyelik yok, sunucu yok, ücret yok. Claude gibi bir tarayıcı ajanı siteye bağlandığında Nibble bunu <strong>algılar</strong> ve ajana çizim araçlarını kendisi öğretir.</p>
+
+    <div class="cta-row">
+      <a class="btn" href="#">▸ Tasarıma Başla</a>
+      <a class="btn ghost" href="#ai">AI ile nasıl bağlanır?</a>
+    </div>
+
+    <div class="freebar">
+      <span>Kayıt gerekmez</span>
+      <span>Sunucuya hiçbir şey gitmez</span>
+      <span>Çalışman tarayıcında kalır</span>
+      <span>Tamamen ücretsiz</span>
+    </div>
+  </div>
+</div>
+
+<div class="palette-strip" aria-hidden="true">
+  <i style="background:#1a1c2c"></i><i style="background:#5d275d"></i><i style="background:#b13e53"></i><i style="background:#ef7d57"></i>
+  <i style="background:#ffcd75"></i><i style="background:#a7f070"></i><i style="background:#38b764"></i><i style="background:#257179"></i>
+  <i style="background:#29366f"></i><i style="background:#3b5dc9"></i><i style="background:#41a6f6"></i><i style="background:#73eff7"></i>
+  <i style="background:#f4f4f4"></i><i style="background:#94b0c2"></i><i style="background:#566c86"></i><i style="background:#333c57"></i>
+</div>
+
+<!-- ═══════════════ SPRITE VİTRİNİ ═══════════════ -->
+<section id="sprites">
+  <div class="wrap">
+    <span class="label">Vitrin</span>
+    <h2>Bu sayfadaki her piksel<br>editörün kendi formatıyla çizildi</h2>
+    <p class="lede">Aşağıdaki sprite'lar görsel dosyası değil. Her biri, AI ajanının kullandığı satır+lejant formatında yazılmış metin — sayfa onları canlı render ediyor. Bir sprite'a tıkla, kaynağını gör.</p>
+
+    <div class="featured">
+      <div>
+        <div class="stage" id="anim-stage"></div>
+        <div class="frame-dots" id="dots"></div>
+      </div>
+      <div>
+        <h3 style="color:var(--accent)">4 kare · 8 fps · 12×10</h3>
+        <p>Bir animasyon Nibble'da böyle görünür: kareler, onion skin, ve tek tuşla GIF. Bu zıplama döngüsünün tamamı 4 metin bloğu.</p>
+        <pre aria-label="Kare 2 kaynağı">frame 2 · legend { D:#257179  L:#38b764  W:#f4f4f4 }
+
+..DDDDDDDD..
+.DLLLLLLLLD.
+.DLWLLLLWLD.
+.DLLLLLLLLD.
+.DDLLLLLLDD.
+..DDDDDDDD..</pre>
+      </div>
+    </div>
+
+    <div class="sprite-grid" id="grid"></div>
+    <pre id="src" style="margin-top:14px; display:none"></pre>
+  </div>
+</section>
+
+<!-- ═══════════════ BOYUTLAR ═══════════════ -->
+<section id="boyutlar">
+  <div class="wrap">
+    <span class="label">Tuval Boyutları</span>
+    <h2>8×8 ikondan 128×128 sahneye</h2>
+    <p class="lede">Aynı sahne, dört çözünürlükte. Küçük tuval ikon ve item için; büyük tuval arka planı dolu, katmanlı manzaralar için. Aşağıdakiler görsel dosyası değil — palet indeksleriyle üretilip sayfada canlı çiziliyor, yani editörün kendi veri modelinde.</p>
+
+    <div class="sizes" id="sizes"></div>
+
+    <div class="cols" style="margin-top:26px">
+      <div class="card">
+        <h3>Neden 100'ün bölenleri gibi kısıtlar var?</h3>
+        <p>Tuval boyutu serbest (8–512 arası), ama önayarlar 16 · 32 · 64 · 128 olarak sunulur çünkü sprite sheet, tile map ve oyun motoru importer'ları ikinin kuvvetleriyle çalışır. Serbest boyut isteyen yazar; çoğunluk hazır olanı seçer.</p>
+      </div>
+      <div class="card">
+        <h3>Büyük tuvalde performans</h3>
+        <p>128×128 = 16.384 piksel; her fırça darbesinde tamamını yeniden çizmek gerekmez. Sadece değişen sınırlayıcı kutu <code class="inline">putImageData</code> ile güncellenir (dirty-rect). 512×512'de bu optimizasyon kritik hale gelir.</p>
+      </div>
+      <div class="card">
+        <h3>Arka plan katmanları</h3>
+        <p>Dolu sahneler katmanla yapılır: gökyüzü, uzak dağlar, ön plan, karakter. Her katman ayrı ayrı gizlenip düzenlenebilir; AI'a “sadece arka plan katmanını değiştir” demek mümkün olur.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════ DÖNÜŞTÜRÜCÜ ═══════════════ -->
+<section id="donustur">
+  <div class="wrap">
+    <span class="label">Resimden Pixel Art</span>
+    <h2>Fotoğrafını at, pixel art olarak çık</h2>
+    <p class="lede">Bir görsel yükle; Nibble onu küçültüp seçtiğin palete kuantize etsin. Sonra üstünde çizmeye devam et, kare ekle, canlandır. <strong>Bu bölüm gerçekten çalışıyor</strong> — bir görsel sürükleyip dene. Hiçbir şey sunucuya gitmiyor, tamamı tarayıcında.</p>
+
+    <div class="conv-ctl">
+      <span class="tag">Boyut</span>
+      <span class="grp" id="ctl-size">
+        <button type="button" data-v="16">16</button>
+        <button type="button" data-v="32">32</button>
+        <button type="button" data-v="64" aria-pressed="true">64</button>
+        <button type="button" data-v="128">128</button>
+      </span>
+      <span class="tag" style="margin-left:12px">Palet</span>
+      <span class="grp" id="ctl-pal">
+        <button type="button" data-v="auto" aria-pressed="true">otomatik 16</button>
+        <button type="button" data-v="sweetie">sweetie‑16</button>
+        <button type="button" data-v="gb">game boy</button>
+      </span>
+      <span class="tag" style="margin-left:12px">Dither</span>
+      <span class="grp" id="ctl-dither">
+        <button type="button" data-v="1" aria-pressed="true">açık</button>
+        <button type="button" data-v="0">kapalı</button>
+      </span>
+    </div>
+
+    <div class="conv">
+      <div class="conv-pane">
+        <h3>Kaynak</h3>
+        <label class="drop" id="drop" tabindex="0">
+          <p>Görseli buraya sürükle<br>veya tıklayıp seç<br><span style="color:var(--dim)">jpg · png · webp · gif</span></p>
+          <input type="file" accept="image/*" id="file" hidden>
+        </label>
+      </div>
+      <div class="conv-pane">
+        <h3>Pixel art çıktısı</h3>
+        <div class="drop" id="out" style="cursor:default">
+          <p>Sonuç burada belirecek</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="cols" style="margin-top:26px">
+      <div class="card">
+        <span class="num">BORU HATTI</span>
+        <h3>Küçült → kuantize → temizle</h3>
+        <p>Kademeli yarılama ile küçültme (kutu ortalaması detayı korur, tek adımda nearest‑neighbor kaybeder) → medyan kesim veya sabit paletle renk kuantizasyonu → sıralı (Bayer) dither → yalnız kalan piksel temizliği.</p>
+      </div>
+      <div class="card">
+        <span class="num">NEDEN ÖNEMLİ</span>
+        <h3>Boş tuval korkusunu kaldırır</h3>
+        <p>Yeni gelenin en büyük engeli boş 64×64 tuvalin karşısında donmak. Bir fotoğraftan başlamak o eşiği yok eder: dönüştür, beğenmediğin yerleri düzelt, öğren. Referans olarak da kullanılabilir.</p>
+      </div>
+      <div class="card">
+        <span class="num">SINIR</span>
+        <h3>Dönüştürme sanat değildir</h3>
+        <p>Otomatik dönüşüm iyi bir <em>başlangıç</em>, bitmiş iş değil. Gerçek pixel art'ta her piksel kasıtlıdır. Nibble bunu gizlemez: çıktı doğrudan düzenlenebilir tuvale gelir, çünkü asıl iş oradan sonra başlar.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════ AI BAĞLANTISI ═══════════════ -->
+<section id="ai">
+  <div class="wrap">
+    <span class="label">Farkımız</span>
+    <h2>AI bize bağlanır — biz AI'a değil</h2>
+    <p class="lede">Rakipler "prompt yaz, görsel al" modelini kuruyor; bu onlara her istekte token maliyeti bindiriyor ve ücretli olmayı zorunlu kılıyor. Nibble tersini yapıyor: <strong>senin AI'ını</strong> editöre davet ediyor.</p>
+
+    <div class="cols">
+      <div class="card">
+        <span class="num">01 · EL SIKIŞMA</span>
+        <h3>Site ajanı tanır</h3>
+        <p>Ajan <code class="inline">window.nibble.help()</code> çağırdığı anda Nibble bunu bir el sıkışma olarak okur. Arayüz <strong>Ortak Mod</strong>'a geçer, canvas'ta ikinci bir imleç belirir, ekranın altında canlı bir eylem şeridi açılır.</p>
+      </div>
+      <div class="card">
+        <span class="num">02 · ÖĞRETME</span>
+        <h3>Site ajanı yönlendirir</h3>
+        <p>Dokümanı biz kendimiz sunuyoruz. <code class="inline">help()</code> sadece API listesi değil — <em>anlık duruma göre</em> öneri döndürür: “Canvas 32×32, boş, palet sweetie-16. Sıradaki adım: <code class="inline">drawFromText</code>.”</p>
+      </div>
+      <div class="card">
+        <span class="num">03 · KOÇLUK</span>
+        <h3>Her yanıt bir ipucu taşır</h3>
+        <p>Her API çağrısının dönüş değerinde <code class="inline">hint</code> alanı var. Ajan yanlış yola saparsa site onu düzeltir: “Pikselleri tek tek yollama, <code class="inline">setPixels</code> ile toplu gönder.” Site pasif bir tuval değil, aktif bir eğitmen.</p>
+      </div>
+    </div>
+
+    <h3 style="margin-top:40px">Kullanıcı için tek adım</h3>
+    <div class="prompt-box">
+      <p id="prompt-text">Claude, nibble.app'i aç ve <code class="inline">window.nibble.help()</code> çağırarak başla. Bana 8 karelik bir yürüyüş döngüsü çiz.</p>
+      <button class="copy-btn" id="copy" type="button">Kopyala</button>
+    </div>
+
+    <pre class="term" aria-label="Örnek ajan oturumu"><span class="c-dim">// ajan siteye bağlandı — Nibble el sıkışmayı algıladı</span>
+
+<span class="c-ai">▸</span> nibble.help()
+<span class="c-ok">←</span> { version: 1, canvas: "32×32 · boş", palette: "sweetie-16",
+    topics: ["drawing","animation","palette","export"],
+    <span class="c-hint">hint: "Boş canvas. drawFromText ile tek çağrıda sprite çiz."</span> }
+
+<span class="c-ai">▸</span> nibble.beginBatch("yürüyüş döngüsü")
+<span class="c-ai">▸</span> nibble.drawFromText({ rows: [...12 satır], legend: {A:3,B:7}, x:10, y:8 })
+<span class="c-ok">←</span> { ok: true, painted: 96,
+    <span class="c-hint">hint: "Kare 0 doldu. addFrame({copyFrom:0}) ile kare 1'e geç."</span> }
+
+<span class="c-ai">▸</span> nibble.readCanvas()          <span class="c-dim">// ne çizdiğini okur, ekran görüntüsü gerekmez</span>
+<span class="c-ok">←</span> { rows: ["............", "....AAAA....", ...] }
+
+<span class="c-you">▸</span> <span class="c-dim">kullanıcı: Ctrl+Z  →  AI'ın yaptığı her şey tek adımda geri alınır</span></pre>
+
+    <div class="cols" style="margin-top:26px">
+      <div class="card">
+        <h3>Neden tıklamak değil, API?</h3>
+        <p>Bir ajanın 32×32 tuvalde tek tek piksel tıklaması 1024 eylem demek — pratikte imkânsız. Aynı iş <code class="inline">drawFromText</code> ile <strong>tek çağrıda</strong> biter. Üstelik LLM'ler karakter ızgarası üretmekte zaten iyi; bu formatı onların doğal düşünme biçimine uyarlıyoruz.</p>
+      </div>
+      <div class="card">
+        <h3>Kapalı döngü</h3>
+        <p><code class="inline">readCanvas()</code> yazma formatının aynısını döndürür. Ajan çizdiğini <em>okuyabildiği</em> için ekran görüntüsü almadan kendi hatasını görüp düzeltir. Token maliyeti ve hata oranı birlikte düşer.</p>
+      </div>
+      <div class="card">
+        <h3>Güvenlik sınırı dar</h3>
+        <p>API sadece mevcut sayfadaki canvas verisini okur/yazar. Ağ erişimi yok, dosya sistemi yok, başka origin yok. En kötü senaryo: çizimin bozulur, <kbd>Ctrl+Z</kbd> dersin. İstemezsen tek tuşla AI erişimini kapatırsın.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════ İSKELET / RIG ═══════════════ -->
+<section id="rig">
+  <div class="wrap">
+    <span class="label">İskelet &amp; Etiketler</span>
+    <h2>AI ile aynı şeyi işaret edin</h2>
+    <p class="lede">Her AI çizim aracının kör noktası: “sol kolu kaldır” dediğinde AI hangi piksellerin sol kol olduğunu bilemez. Nibble'da pixel art'ının üstüne <strong>nokta koyup çizgi çekiyor, isim veriyorsun.</strong> O andan sonra sen ve AI aynı sözlüğü konuşuyorsunuz.</p>
+
+    <div class="rig-layout">
+      <div class="rig-panel">
+        <div class="rig-stage" id="rig-stage"></div>
+        <div class="rig-ctl">
+          <button type="button" id="btn-arm">↑ sol kolu kaldır</button>
+          <button type="button" id="btn-hair">◐ saçı değiştir</button>
+        </div>
+        <div class="rig-legend">
+          <b class="k-node">düğüm</b>
+          <b class="k-bone">kemik</b>
+        </div>
+      </div>
+
+      <div>
+        <div class="cols" style="margin-top:0; grid-template-columns:1fr">
+          <div class="card">
+            <span class="num">01 · İSİMLENDİR</span>
+            <h3>Rig Modu — noktalar ve çizgiler</h3>
+            <p>Tuval soluklaşır, üstüne geçersin. Tıkla → düğüm koy, isim yaz (<code class="inline">omuz_sol</code>). Düğümden düğüme sürükle → kemik oluştur (<code class="inline">kol_sol</code>). Bir bölgeyi seç → <code class="inline">saç</code> diye adlandır. İskelet karakterin kendisine ait; karelerden bağımsız yaşar.</p>
+          </div>
+          <div class="card">
+            <span class="num">02 · KOMUT VER</span>
+            <h3>“Sol kolu 3 piksel kaldır”</h3>
+            <p>AI artık ne demek istediğini biliyor, çünkü <code class="inline">kol_sol</code> hangi pikselleri kapsadığını rig'den okuyor. Renk için de aynısı: <code class="inline">saç</code> isimlendirilmişse “saçı sarıya çevir” tek çağrı.</p>
+          </div>
+          <div class="card">
+            <span class="num">03 · SOR</span>
+            <h3>“Bak, doğru yerde mi?”</h3>
+            <p>Site geometrik analizi kendisi yapıp AI'a <em>gözlem</em> olarak sunar: “el_sol düğümünde piksel yok — kol boşlukta bitiyor.” AI tahmin etmez, ölçülmüş veriyle cevap verir.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <pre class="term" style="margin-top:26px" aria-label="Rig üzerinden AI diyaloğu"><span class="c-you">▸</span> <span class="c-dim">sen: "sol kolu biraz kaldır, selam veriyormuş gibi"</span>
+
+<span class="c-ai">▸</span> nibble.rig.list()
+<span class="c-ok">←</span> { nodes: ["kafa","boyun","omuz_sol","el_sol","omuz_sag","el_sag","bel", ...],
+    bones: { kol_sol: "omuz_sol→el_sol · uzunluk 3 · açı 90°" },
+    regions: ["sac","govde","pantolon"] }
+
+<span class="c-ai">▸</span> nibble.rotate("kol_sol", { pivot: "omuz_sol", degrees: -55 })
+<span class="c-ok">←</span> { ok: true, moved: 7, <span class="c-hint">hint: "el_sol (3,11)→(2,5). Kemik uzunluğu korundu."</span> }
+
+<span class="c-you">▸</span> <span class="c-dim">sen: "peki bu doğru mu görünüyor?"</span>
+
+<span class="c-ai">▸</span> nibble.critique("kol_sol")
+<span class="c-ok">←</span> { observations: [
+      "kol_sol ile govde arası 55° — omuz eklemi için doğal aralıkta",
+      "el_sol düğümünde 2 piksel var, kol kopuk değil",
+      <span class="c-hint">"uyarı: kol_sag hâlâ 90°, duruş asimetrik — kasıtlı mı?"</span>
+    ] }</pre>
+
+    <div class="cols">
+      <div class="card">
+        <h3 style="color:var(--accent)">Asıl ödül: otomatik ara kareler</h3>
+        <p>Düğümlerin kare başına konumu tutulunca iskelet bir <strong>poz anahtarı</strong> olur. Kare 1'i çiz ve rig'le. Kare 8'de sadece düğümleri sürükle — 30 saniyelik iş. Aradaki 6 kareyi AI, kemik açılarını interpole ederek üretir.</p>
+        <p>Kare tutarlılığı, AI animasyonunun en zor problemi. Piksellerden tahmin etmek yerine iskeletten türetmek onu <em>yapısal olarak</em> çözer — rakiplerin ücretli olarak sattığı şey bu.</p>
+      </div>
+      <div class="card">
+        <h3>Yıkıcı değil</h3>
+        <p>İskelet ayrı bir katman; piksellerine dokunmaz, dışa aktarımda yer almaz. İstemezsen hiç açmazsın — Nibble rig olmadan da tam bir editör. Açtığında ise AI'a verdiğin her komut belirsizlikten kurtulur.</p>
+      </div>
+      <div class="card">
+        <h3>Sadece AI için değil</h3>
+        <p>Rig senin de işine yarar: <code class="inline">saç</code> bölgesini seçip paletten renk denemek, <code class="inline">kol_sol</code>'u sürükleyip pozu bozmadan taşımak, simetri için <code class="inline">kol_sag</code>'a aynalamak. AI kapalıyken de kazanç.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════ ARAYÜZ ═══════════════ -->
+<section id="ui">
+  <div class="wrap">
+    <span class="label">Arayüz</span>
+    <h2>Photoshop düzenini kırıyoruz</h2>
+    <p class="lede">Aseprite, Piskel, Pixilart — hepsi aynı iskeleti kullanıyor: sol araç çubuğu, sağ paneller, alt timeline, ortada küçülmüş bir tuval. Nibble iki moda ayrılıyor ve ikisinde de tuval kazanıyor.</p>
+
+    <div class="cols">
+      <div>
+        <div class="mock">
+          <div class="mock-head"><b>Çizim Modu</b> <span>· krom yok</span></div>
+          <div class="mock-body">
+            <div class="ramp-strip" aria-hidden="true">
+              <i style="background:#b13e53"></i><i style="background:#ef7d57"></i><i style="background:#ffcd75"></i>
+              <i style="background:#257179"></i><i style="background:#38b764"></i><i style="background:#a7f070"></i>
+            </div>
+            <div id="mock-sprite"></div>
+            <span class="cursor-tag ai">◤ AI</span>
+            <span class="cursor-tag you">◢ sen</span>
+          </div>
+          <div class="mock-foot"><span class="c-ai">▸</span> drawFromText 12×8 @ (4,6) · 96px</div>
+        </div>
+        <p style="margin-top:14px">Ekranın neredeyse tamamı tuval. Araçlar imleçte radyal menü olarak beliriyor, palet <strong>renk rampaları</strong> halinde (düz swatch ızgarası değil — pixel art'çılar renk rampasıyla düşünür) elinin yanında yüzüyor. AI bağlıysa ikinci bir imleç görüyorsun: birlikte çiziyormuş gibi.</p>
+      </div>
+
+      <div>
+        <div class="mock">
+          <div class="mock-head"><b>Animasyon Modu</b> <span>· film şeridi</span></div>
+          <div class="mock-body">
+            <div class="filmstrip">
+              <div class="cell sm">02</div>
+              <div class="cell md">03</div>
+              <div class="cell lg" id="mock-frame"></div>
+              <div class="cell md">05</div>
+              <div class="cell sm">06</div>
+            </div>
+          </div>
+          <div class="mock-foot">04 / 08 · 8 fps · onion skin ±2</div>
+        </div>
+        <p style="margin-top:14px">Aynı proje, farklı zihin durumu. Kareler yatay bir film şeridi olarak akıyor, aktif kare ortada büyüyor, komşular yanlarda soluklaşıyor — onion skin'i ayrı bir ayar olarak değil, <em>düzenin kendisi</em> olarak görüyorsun. Zamanda kaydırarak geziniyorsun.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════ YOL HARİTASI ═══════════════ -->
+<section id="plan">
+  <div class="wrap">
+    <span class="label">Yol Haritası</span>
+    <h2>Önce editör, sonra ajan</h2>
+    <p class="lede">Ajan katmanı sağlam bir editörün üstüne konur; tersi çok daha acılı olur. Faz 1 tek başına yayınlanabilir bir ürün — AI olmadan da tam işlevli.</p>
+
+    <div class="tbl-wrap">
+      <table>
+        <thead><tr><th>Aşama</th><th>İçerik</th><th>Çıktı</th></tr></thead>
+        <tbody>
+          <tr><td>M0–M1</td><td>Veri modeli, katmanlı canvas render, kalem/silgi, Bresenham</td><td>Çizebiliyorsun</td></tr>
+          <tr><td>M2</td><td>Delta tabanlı undo/redo + batch <span class="done">(erken yapılmalı)</span></td><td>Güvenle deniyorsun</td></tr>
+          <tr><td>M3</td><td>Kova, şekiller, damlalık, pixel-perfect stroke, simetri, renk rampaları</td><td>Ciddi araç seti</td></tr>
+          <tr><td>M4–M5</td><td>Katmanlar, kareler, film şeridi, onion skin, oynatma</td><td>Animasyon yapılabiliyor</td></tr>
+          <tr><td>M6</td><td>PNG · GIF (worker) · sprite sheet + Aseprite uyumlu JSON</td><td>Dışa aktarım</td></tr>
+          <tr><td>M7</td><td>IndexedDB otomatik kayıt, proje listesi, “taslakları temizle”</td><td>İşin kaybolmuyor</td></tr>
+          <tr><td>M8</td><td>Kısayollar (Aseprite uyumlu), landing page, boş durumlar</td><td><strong>Faz 1 yayında</strong></td></tr>
+          <tr><td>M9</td><td><code>window.nibble</code>, <code>help()</code>, <code>/llms.txt</code>, <code>/agent</code></td><td>Ajan API'si</td></tr>
+          <tr><td>M10</td><td>El sıkışma algılama, Ortak Mod, ikinci imleç, eylem şeridi</td><td><strong>Fark burada</strong></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="cols" style="margin-top:32px">
+      <div class="card">
+        <span class="num">TEKNİK NOT</span>
+        <h3>Depolama: IndexedDB, saf localStorage değil</h3>
+        <p>localStorage'ın 5MB sınırı ve string-only kısıtı var; 20 karelik bir proje kotayı patlatır ve kullanıcı işini kaybeder. Proje verisi IndexedDB'de (yüzlerce MB, typed array'i doğrudan tutar), sadece ayarlar localStorage'da. İkisi de tarayıcıda, “temizle” deyince ikisi de gider.</p>
+      </div>
+      <div class="card">
+        <span class="num">TEKNİK NOT</span>
+        <h3>GIF gecikmesi santisaniye</h3>
+        <p>GIF kare süresini 1/100 saniye biriminde tutar. 60fps → 1.67cs → yuvarlanır, animasyon bozulur. Bu yüzden fps seçimi 100'ün bölenlerine kilitli: <strong>10 · 12.5 · 20 · 25 · 50</strong>. Veri modelinde tam sayı <code class="inline">durationCs</code> tutulur.</p>
+      </div>
+      <div class="card">
+        <span class="num">TEKNİK NOT</span>
+        <h3>Piksel verisi React'e girmez</h3>
+        <p>Buffer'ları React state'ine koymak her fırça hareketinde tüm ağacı yeniden render eder — 60fps çizim 5fps'e düşer. React sadece metadata bilir; çizim imperatif olarak canvas'a yapılır. Sıfırdan yazılan pixel editörlerinin toslayacağı ilk duvar bu.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap foot-row">
+    <span class="mark" aria-hidden="true" style="width:22px;height:22px;gap:1px">
+      <i></i><i></i><i></i><i class="bite"></i>
+      <i></i><i></i><i></i><i></i>
+      <i></i><i></i><i></i><i></i>
+      <i></i><i></i><i></i><i></i>
+    </span>
+    <span>NIBBLE — 1 nibble = 4 bit = 16 renk</span>
+    <span style="margin-left:auto">Konsept · Faz 0 · Bu sayfa bir tasarım önerisidir</span>
+  </div>
+</footer>
+
+<script>
+(() => {
+  "use strict";
+
+  /* ── Tema ─────────────────────────────────────────── */
+  document.getElementById("theme").addEventListener("click", () => {
+    const r = document.documentElement;
+    const dark = r.getAttribute("data-theme") === "dark" ||
+      (!r.hasAttribute("data-theme") && matchMedia("(prefers-color-scheme: dark)").matches);
+    r.setAttribute("data-theme", dark ? "light" : "dark");
+  });
+
+  /* ── Wordmark: NIBBLE, 5×7 piksel harfler ─────────── */
+  const WORD = [
+    "#...#.###.####..####..#.....#####",
+    "#...#..#..#...#.#...#.#.....#....",
+    "##..#..#..#...#.#...#.#.....#....",
+    "#.#.#..#..####..####..#.....####.",
+    "#..##..#..#...#.#...#.#.....#....",
+    "#...#..#..#...#.#...#.#.....#....",
+    "#...#.###.####..####..#####.#####"
+  ];
+  const wm = document.getElementById("wordmark");
+  const cols = WORD[0].length;
+  wm.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
+  wm.style.width = `min(100%, ${cols * 14}px)`;
+  const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  WORD.forEach((row, y) => {
+    [...row].forEach((ch, x) => {
+      const s = document.createElement("span");
+      if (ch === "#") {
+        s.className = "on";
+        // son harf E'nin sağ üst köşesi vurgulu — logodaki "ısırık"la akraba
+        s.style.background = (x > cols - 6 && y === 0) ? "var(--accent)" : "var(--ink)";
+        if (!reduce) s.style.animationDelay = ((x * 7 + y * 11) % 160) * 4 + "ms";
+      }
+      wm.appendChild(s);
+    });
+  });
+
+  /* ── Sprite render motoru (ajan formatının aynısı) ── */
+  function render(host, rows, legend, cell) {
+    const w = rows[0].length;
+    const g = document.createElement("div");
+    g.className = "pixgrid";
+    g.style.gridTemplateColumns = `repeat(${w}, ${cell}px)`;
+    for (const row of rows) {
+      for (const ch of row) {
+        const s = document.createElement("span");
+        const c = legend[ch];
+        if (c && c !== "transparent") s.style.background = c;
+        g.appendChild(s);
+      }
+    }
+    host.replaceChildren(g);
+    return g;
+  }
+
+  /* ── Zıplayan slime: 4 kare ───────────────────────── */
+  const SLIME_LEGEND = { ".": "transparent", D: "#257179", L: "#38b764", W: "#f4f4f4" };
+  const SLIME = [
+    ["............","............","....DDDD....","...DLLLLD...","..DLLLLLLD..","..DLWLLWLD..","..DLLLLLLD..","..DDLLLLDD..","...DDDDDD...","............"],
+    ["............","............","............","............","..DDDDDDDD..",".DLLLLLLLLD.",".DLWLLLLWLD.",".DLLLLLLLLD.",".DDLLLLLLDD.","..DDDDDDDD.."],
+    ["....DDDD....","...DLLLLD...","...DLLLLD...","...DLWWLD...","...DLLLLD...","...DLLLLD...","...DLLLLD...","....DLLD....",".....DD.....","............"],
+    ["............","............","....DDDD....","...DLLLLD...","..DLLLLLLD..","..DLWLLWLD..","..DLLLLLLD..","..DDLLLLDD..","...DDDDDD...","............"]
+  ];
+  const stage = document.getElementById("anim-stage");
+  const dots = document.getElementById("dots");
+  SLIME.forEach(() => dots.appendChild(document.createElement("i")));
+  let f = 0;
+  function tick() {
+    render(stage, SLIME[f], SLIME_LEGEND, 13);
+    [...dots.children].forEach((d, i) => d.classList.toggle("on", i === f));
+    f = (f + 1) % SLIME.length;
+  }
+  tick();
+  if (!reduce) setInterval(tick, 125);   // 8 fps
+
+  /* ── Vitrin sprite'ları ───────────────────────────── */
+  const ITEMS = [
+    { name: "kalp", legend: { ".": "transparent", D: "#b13e53", L: "#ef7d57", H: "#ffcd75" },
+      rows: [".DD..DD.","DLLDDLLD","DLLLLLLD","DHLLLLLD",".DLLLLD.","..DLLD..","...DD...","........"] },
+    { name: "anahtar", legend: { ".": "transparent", G: "#ffcd75", D: "#ef7d57" },
+      rows: ["..DGGD..",".G.DD.G.",".G....G.","..DGGD..","...GG...","...GD...","...GGD..","...GD..."] },
+    { name: "iksir", legend: { ".": "transparent", C: "#94b0c2", P: "#41a6f6", H: "#73eff7" },
+      rows: ["...CC...","...CC...","..CCCC..","..CPPC..",".CPHPPC.",".CPPPPC.",".CPPPPC.","..CCCC.."] },
+    { name: "mantar", legend: { ".": "transparent", R: "#b13e53", W: "#f4f4f4", C: "#94b0c2", S: "#566c86" },
+      rows: ["..RRRR..",".RWWRRR.","RWWRRRRR","RRRRWWRR",".SCCCCS.","..SCCS..","..SCCS..","..SSSS.."] },
+    { name: "kilic", legend: { ".": "transparent", S: "#94b0c2", H: "#f4f4f4", G: "#ffcd75", B: "#b13e53" },
+      rows: ["......HS",".....HSS","....HSS.","...HSS..","..HSS...",".GGG....","..B.....",".B......"] },
+    { name: "yildiz", legend: { ".": "transparent", G: "#ffcd75", H: "#f4f4f4" },
+      rows: ["...G....","...G....",".G.H.G..","..GHG...","GGHHHGG.","..GHG...",".G.G.G..","...G...."] }
+  ];
+  const grid = document.getElementById("grid");
+  const src = document.getElementById("src");
+  ITEMS.forEach(it => {
+    const card = document.createElement("button");
+    card.type = "button";
+    card.className = "sprite-card";
+    const holder = document.createElement("div");
+    render(holder, it.rows, it.legend, 11);
+    const cap = document.createElement("span");
+    cap.className = "cap";
+    cap.textContent = it.name + " · 8×8";
+    card.append(holder.firstChild, cap);
+    card.addEventListener("click", () => {
+      const leg = Object.entries(it.legend).map(([k, v]) => `${k}:${v}`).join("  ");
+      src.textContent =
+        `nibble.drawFromText({\n` +
+        `  legend: { ${leg} },\n` +
+        `  rows: [\n` + it.rows.map(r => `    "${r}"`).join(",\n") + `\n  ]\n})`;
+      src.style.display = "block";
+      src.scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "nearest" });
+    });
+    grid.appendChild(card);
+  });
+
+  /* ── Maket sprite'ları ────────────────────────────── */
+  render(document.getElementById("mock-sprite"), SLIME[0], SLIME_LEGEND, 9);
+  render(document.getElementById("mock-frame"), SLIME[2], SLIME_LEGEND, 7);
+
+  /* ═══ SAHNE ÜRETECİ — palet indeksleriyle, editörün veri modelinde ═══ */
+  const PAL16 = ["#1a1c2c","#29366f","#3b5dc9","#41a6f6","#73eff7","#f4f4f4",
+                 "#ffcd75","#ef7d57","#b13e53","#5d275d","#257179","#38b764",
+                 "#a7f070","#566c86","#94b0c2","#333c57"];
+  const BAYER = [[0,8,2,10],[12,4,14,6],[3,11,1,9],[15,7,13,5]];
+
+  function mulberry32(a) {
+    return function () {
+      a |= 0; a = (a + 0x6D2B79F5) | 0;
+      let t = Math.imul(a ^ (a >>> 15), 1 | a);
+      t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    };
+  }
+
+  function makeScene(n, seed) {
+    const rnd = mulberry32(seed);
+    const g = new Uint8Array(n * n);
+    const put = (x, y, v) => { x |= 0; y |= 0; if (x >= 0 && x < n && y >= 0 && y < n) g[y * n + x] = v; };
+    const hz = Math.round(n * 0.60);
+    const rim = Math.max(1, Math.round(n * 0.015));
+
+    // gökyüzü — mor → kızıl → mercan → altın, Bayer geçişli
+    const sky = [9, 8, 7, 6];
+    for (let y = 0; y < hz; y++) {
+      const t = (y / Math.max(1, hz - 1)) * (sky.length - 1);
+      const i = Math.min(Math.floor(t), sky.length - 2), f = t - i;
+      for (let x = 0; x < n; x++) put(x, y, f > (BAYER[y & 3][x & 3] + 0.5) / 16 ? sky[i + 1] : sky[i]);
+    }
+
+    // güneş
+    const sr = Math.max(1, Math.round(n * 0.10));
+    const sx = Math.round(n * 0.70), sy = Math.round(hz * 0.42);
+    for (let y = -sr; y <= sr; y++) for (let x = -sr; x <= sr; x++) {
+      const d = Math.hypot(x, y);
+      if (d <= sr) put(sx + x, sy + y, d < sr * 0.58 ? 5 : 6);
+    }
+
+    // sırt çizgisi üreteci
+    const ridge = (base, amp, f1, f2) => {
+      const o1 = rnd() * 9, o2 = rnd() * 9, h = [];
+      for (let x = 0; x < n; x++)
+        h[x] = Math.round(base + amp * (Math.sin(x / n * f1 * 6.283 + o1) * 0.62
+                                      + Math.sin(x / n * f2 * 6.283 + o2) * 0.38));
+      return h;
+    };
+
+    // uzak dağlar (slate, mor tepe ışığı)
+    const m1 = ridge(hz - n * 0.15, n * 0.07, 1.7, 3.9);
+    for (let x = 0; x < n; x++) for (let y = Math.max(0, m1[x]); y < hz; y++)
+      put(x, y, y < m1[x] + rim ? 9 : 15);
+
+    // yakın tepeler (silüet, teal ışık)
+    const m2 = ridge(hz - n * 0.045, n * 0.042, 2.6, 5.3);
+    for (let x = 0; x < n; x++) for (let y = Math.max(0, m2[x]); y < hz; y++)
+      put(x, y, y < m2[x] + rim ? 10 : 0);
+
+    // ağaçlar — yakın tepe hattında
+    const treeCount = Math.max(2, Math.round(n / 14));
+    for (let t = 0; t < treeCount; t++) {
+      const tx = Math.round(rnd() * (n - 4)) + 2;
+      const th = Math.max(2, Math.round(n * (0.05 + rnd() * 0.045)));
+      const baseY = m2[tx];
+      for (let k = 0; k < th; k++) {
+        const w = Math.round((1 - k / th) * th * 0.55);
+        for (let x = -w; x <= w; x++) put(tx + x, baseY - k, 0);
+      }
+      put(tx, baseY - th, 10);
+    }
+
+    // su — dalga bantları + güneş yansıması
+    for (let y = hz; y < n; y++) {
+      const dep = (y - hz) / Math.max(1, n - hz);
+      const band = dep < 0.3 ? 2 : dep < 0.65 ? 1 : 0;
+      const up = dep < 0.3 ? 3 : dep < 0.65 ? 2 : 1;
+      for (let x = 0; x < n; x++) {
+        const wob = Math.sin(x / n * 12 + y * 0.9) * 0.5 + 0.5;
+        put(x, y, wob > (BAYER[y & 3][x & 3] + 0.5) / 16 ? up : band);
+        const glint = Math.abs(x - sx) < sr * (0.5 + dep * 1.6);
+        if (glint && ((x + y) & 3) === 0) put(x, y, dep < 0.5 ? 6 : 7);
+      }
+    }
+    return g;
+  }
+
+  function paintIndexed(canvas, g, n, scale) {
+    canvas.width = n; canvas.height = n;
+    canvas.style.maxWidth = (n * scale) + "px";
+    const ctx = canvas.getContext("2d");
+    const id = ctx.createImageData(n, n);
+    for (let i = 0; i < g.length; i++) {
+      const hex = PAL16[g[i]];
+      id.data[i * 4]     = parseInt(hex.slice(1, 3), 16);
+      id.data[i * 4 + 1] = parseInt(hex.slice(3, 5), 16);
+      id.data[i * 4 + 2] = parseInt(hex.slice(5, 7), 16);
+      id.data[i * 4 + 3] = 255;
+    }
+    ctx.putImageData(id, 0, 0);
+  }
+
+  const sizesHost = document.getElementById("sizes");
+  [16, 32, 64, 128].forEach(n => {
+    const card = document.createElement("div");
+    card.className = "size-card";
+    const cv = document.createElement("canvas");
+    paintIndexed(cv, makeScene(n, 20260815), n, 8);
+    const cap = document.createElement("span");
+    cap.className = "cap";
+    cap.innerHTML = `<b>${n}×${n}</b> · ${(n * n).toLocaleString("tr-TR")} piksel`;
+    card.append(cv, cap);
+    sizesHost.appendChild(card);
+  });
+
+  /* ═══ RESİM → PIXEL ART (tamamı tarayıcıda) ═══ */
+  const hex2rgb = h => [parseInt(h.slice(1,3),16), parseInt(h.slice(3,5),16), parseInt(h.slice(5,7),16)];
+  const PALETTES = {
+    sweetie: PAL16.map(hex2rgb),
+    gb: ["#0f380f","#306230","#8bac0f","#9bbc0f"].map(hex2rgb)
+  };
+
+  function medianCut(px, depth) {
+    if (!px.length) return [[0, 0, 0]];
+    if (depth === 0) {
+      const s = px.reduce((a, p) => [a[0] + p[0], a[1] + p[1], a[2] + p[2]], [0, 0, 0]);
+      return [s.map(v => Math.round(v / px.length))];
+    }
+    let best = 0, bestRange = -1;
+    for (let ch = 0; ch < 3; ch++) {
+      let mn = 255, mx = 0;
+      for (const p of px) { if (p[ch] < mn) mn = p[ch]; if (p[ch] > mx) mx = p[ch]; }
+      if (mx - mn > bestRange) { bestRange = mx - mn; best = ch; }
+    }
+    px.sort((a, b) => a[best] - b[best]);
+    const mid = px.length >> 1;
+    return medianCut(px.slice(0, mid), depth - 1).concat(medianCut(px.slice(mid), depth - 1));
+  }
+
+  function nearest(pal, r, g, b) {
+    let bi = 0, bd = Infinity;
+    for (let i = 0; i < pal.length; i++) {
+      const p = pal[i];
+      const d = (p[0]-r)**2 * 0.30 + (p[1]-g)**2 * 0.59 + (p[2]-b)**2 * 0.11;
+      if (d < bd) { bd = d; bi = i; }
+    }
+    return pal[bi];
+  }
+
+  const state = { size: 64, pal: "auto", dither: true, img: null };
+
+  function convert() {
+    if (!state.img) return;
+    const img = state.img, size = state.size;
+    const s = Math.min(img.naturalWidth, img.naturalHeight);
+    const ox = (img.naturalWidth - s) / 2, oy = (img.naturalHeight - s) / 2;
+
+    // kademeli yarılama — kutu ortalaması detayı korur
+    let cur = document.createElement("canvas");
+    cur.width = cur.height = s;
+    const c0 = cur.getContext("2d");
+    c0.imageSmoothingQuality = "high";
+    c0.drawImage(img, ox, oy, s, s, 0, 0, s, s);
+    let w = s;
+    while (w / 2 > size) {
+      w = Math.max(size, Math.floor(w / 2));
+      const nx = document.createElement("canvas");
+      nx.width = nx.height = w;
+      const c2 = nx.getContext("2d");
+      c2.imageSmoothingQuality = "high";
+      c2.drawImage(cur, 0, 0, w, w);
+      cur = nx;
+    }
+    const fin = document.createElement("canvas");
+    fin.width = fin.height = size;
+    const fc = fin.getContext("2d");
+    fc.imageSmoothingQuality = "high";
+    fc.drawImage(cur, 0, 0, size, size);
+
+    const id = fc.getImageData(0, 0, size, size), d = id.data;
+
+    let pal;
+    if (state.pal === "auto") {
+      const sample = [];
+      const step = Math.max(1, Math.floor(d.length / 4 / 4000));
+      for (let i = 0; i < d.length; i += 4 * step) sample.push([d[i], d[i+1], d[i+2]]);
+      pal = medianCut(sample, 4);
+    } else pal = PALETTES[state.pal];
+
+    const clamp = v => v < 0 ? 0 : v > 255 ? 255 : v;
+    for (let y = 0; y < size; y++) for (let x = 0; x < size; x++) {
+      const i = (y * size + x) * 4;
+      let r = d[i], g = d[i+1], b = d[i+2];
+      if (state.dither) {
+        const off = ((BAYER[y & 3][x & 3] + 0.5) / 16 - 0.5) * 40;
+        r = clamp(r + off); g = clamp(g + off); b = clamp(b + off);
+      }
+      const c = nearest(pal, r, g, b);
+      d[i] = c[0]; d[i+1] = c[1]; d[i+2] = c[2]; d[i+3] = 255;
+    }
+    fc.putImageData(id, 0, 0);
+    fin.style.imageRendering = "pixelated";
+    document.getElementById("out").replaceChildren(fin);
+  }
+
+  function loadFile(file) {
+    if (!file || !file.type.startsWith("image/")) return;
+    const url = URL.createObjectURL(file);
+    const img = new Image();
+    img.onload = () => {
+      state.img = img;
+      const prev = new Image();
+      prev.src = url;
+      document.getElementById("drop").replaceChildren(prev);
+      convert();
+    };
+    img.src = url;
+  }
+
+  const drop = document.getElementById("drop"), fileIn = document.getElementById("file");
+  drop.addEventListener("click", () => fileIn.click());
+  drop.addEventListener("keydown", e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); fileIn.click(); } });
+  fileIn.addEventListener("change", e => loadFile(e.target.files[0]));
+  ["dragenter", "dragover"].forEach(t => drop.addEventListener(t, e => { e.preventDefault(); drop.classList.add("over"); }));
+  ["dragleave", "drop"].forEach(t => drop.addEventListener(t, e => { e.preventDefault(); drop.classList.remove("over"); }));
+  drop.addEventListener("drop", e => loadFile(e.dataTransfer.files[0]));
+
+  [["ctl-size", "size", v => +v], ["ctl-pal", "pal", v => v], ["ctl-dither", "dither", v => v === "1"]]
+    .forEach(([id, key, cast]) => {
+      const grp = document.getElementById(id);
+      grp.addEventListener("click", e => {
+        const btn = e.target.closest("button");
+        if (!btn) return;
+        [...grp.children].forEach(b => b.setAttribute("aria-pressed", String(b === btn)));
+        state[key] = cast(btn.dataset.v);
+        convert();
+      });
+    });
+
+  /* ═══ İSKELET DEMOSU ═══ */
+  const CH_BASE = [
+    "....DDDDDD....", "...DHHHHHHD...", "..DHHSSSSHHD..", "..DHSWSSWSHD..",
+    "..DHSSSSSSHD..", "...DSSSSSSD...", "....DSSSSD....", ".....DSSD.....",
+    "..AABBBBBBAA..", "..AABBBBBBAA..", "..AABBBBBBAA..", "...ABBBBBBA...",
+    "....BBBBBB....", "....PPPPPP....", "....PP..PP....", "....PP..PP....",
+    "....PP..PP....", "...KKK..KKK..."
+  ];
+  const CH_ARM = CH_BASE.slice();
+  CH_ARM[5]  = "AA.DSSSSSSD...";
+  CH_ARM[6]  = "AA..DSSSSD....";
+  CH_ARM[7]  = "AA...DSSD.....";
+  CH_ARM[9]  = "....BBBBBBAA..";
+  CH_ARM[10] = "....BBBBBBAA..";
+  CH_ARM[11] = "....BBBBBBA...";
+
+  const HAIRS = ["#b13e53", "#ffcd75", "#5d275d", "#38b764", "#41a6f6"];
+  const rig = { armUp: false, hair: 0 };
+
+  const NODES = {
+    kafa: [7, 3], boyun: [7, 7], omuz_sol: [3, 8], el_sol: [3, 11],
+    omuz_sag: [10, 8], el_sag: [10, 11], bel: [7, 12],
+    ayak_sol: [5, 17], ayak_sag: [9, 17]
+  };
+  const BONES = [["boyun","kafa"], ["omuz_sol","boyun"], ["omuz_sag","boyun"],
+                 ["boyun","bel"], ["omuz_sol","el_sol"], ["omuz_sag","el_sag"],
+                 ["bel","ayak_sol"], ["bel","ayak_sag"]];
+  const TAGS = [["kafa", "right"], ["omuz_sol", "left"], ["el_sol", "left"],
+                ["omuz_sag", "right"], ["ayak_sag", "right"]];
+
+  const RW = 14, RH = 18, RC = 12;
+  const rigStage = document.getElementById("rig-stage");
+
+  function drawRig() {
+    const legend = { ".": "transparent", D: "#29366f", H: HAIRS[rig.hair], S: "#ffcd75",
+                     W: "#f4f4f4", A: "#3b5dc9", B: "#41a6f6", P: "#566c86", K: "#333c57" };
+    const nodes = Object.assign({}, NODES);
+    if (rig.armUp) nodes.el_sol = [2, 5];
+
+    rigStage.replaceChildren();
+    rigStage.style.width = (RW * RC) + "px";
+    render(rigStage, rig.armUp ? CH_ARM : CH_BASE, legend, RC);
+
+    const ns = "http://www.w3.org/2000/svg";
+    const svg = document.createElementNS(ns, "svg");
+    svg.setAttribute("viewBox", `0 0 ${RW} ${RH}`);
+    svg.setAttribute("preserveAspectRatio", "none");
+    for (const [a, b] of BONES) {
+      const l = document.createElementNS(ns, "line");
+      l.setAttribute("x1", nodes[a][0] + .5); l.setAttribute("y1", nodes[a][1] + .5);
+      l.setAttribute("x2", nodes[b][0] + .5); l.setAttribute("y2", nodes[b][1] + .5);
+      l.setAttribute("class", "rig-bone");
+      svg.appendChild(l);
+    }
+    for (const [k, p] of Object.entries(nodes)) {
+      const c = document.createElementNS(ns, "circle");
+      c.setAttribute("cx", p[0] + .5); c.setAttribute("cy", p[1] + .5);
+      c.setAttribute("r", .42);
+      c.setAttribute("class", "rig-node" + (k.startsWith("el") || k.startsWith("ayak") ? " tip" : ""));
+      svg.appendChild(c);
+    }
+    rigStage.appendChild(svg);
+
+    for (const [name, side] of TAGS) {
+      const t = document.createElement("span");
+      t.className = "rig-tag" + (side === "left" ? " left" : "");
+      t.textContent = name;
+      t.style.top = ((nodes[name][1] + .5) / RH * 100) + "%";
+      rigStage.appendChild(t);
+    }
+  }
+  drawRig();
+  document.getElementById("btn-arm").addEventListener("click", () => { rig.armUp = !rig.armUp; drawRig(); });
+  document.getElementById("btn-hair").addEventListener("click", () => { rig.hair = (rig.hair + 1) % HAIRS.length; drawRig(); });
+
+  /* ── Prompt kopyala ───────────────────────────────── */
+  const copy = document.getElementById("copy");
+  copy.addEventListener("click", async () => {
+    try {
+      await navigator.clipboard.writeText(document.getElementById("prompt-text").textContent.trim());
+      copy.textContent = "Kopyalandı";
+      setTimeout(() => (copy.textContent = "Kopyala"), 1600);
+    } catch { copy.textContent = "Kopyalanamadı"; }
+  });
+})();
+</script>

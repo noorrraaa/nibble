@@ -1,0 +1,29 @@
+{
+  "name": "nibble",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Üyeliksiz, sunucusuz, ücretsiz pixel art & animasyon editörü — AI ajanların kullanabildiği.",
+  "scripts": {
+    "dev": "next dev -p 3000",
+    "build": "next build",
+    "start": "next start",
+    "typecheck": "tsc --noEmit",
+    "test": "tsc -p tsconfig.test.json && node --test \"test-build/**/*.test.js\"",
+    "lint": "eslint src"
+  },
+  "dependencies": {
+    "gifenc": "^1.0.3",
+    "next": "^15.1.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "zustand": "^5.0.2"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.0",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "eslint": "^9.39.5",
+    "eslint-config-next": "^15.5.23",
+    "typescript": "^5.7.0"
+  }
+}
