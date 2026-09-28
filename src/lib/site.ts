@@ -21,7 +21,7 @@ export const LEGAL_CONTROLLER = "Emre Kızak";
  * Hukuki başvuru adresi. TODO(user): kişisel bir adres kararlaştırılınca yaz.
  * Boşken sayfalar adres yerine "yakında" notu gösterir. ⛔ İş maili ASLA.
  */
-export const LEGAL_CONTACT_EMAIL = "";
+export const LEGAL_CONTACT_EMAIL = "thecrimelogs.contact@gmail.com";
 
 /** Metinlerin yürürlük tarihi (sayfada gösterilir). */
 export const LEGAL_EFFECTIVE_DATE = "28 Eylül 2026";
