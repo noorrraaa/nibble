@@ -4,6 +4,7 @@ import { GIFEncoder, applyPalette, quantize } from "gifenc";
 import { encodeApng, type ApngStats } from "./apng";
 import { nodePosResolved, normaliseRigName, regionRect } from "./rig";
 import type { PixelDocument } from "./pixel-document";
+import { SITE_URL } from "./site";
 import {
   FPS_OPTIONS,
   isHex,
@@ -294,7 +295,7 @@ export async function exportSpriteSheet(
   const meta = {
     frames: jsonFrames,
     meta: {
-      app: "https://nibble.app",
+      app: SITE_URL,
       version: "1.0",
       image: `${safeName(name)}_sheet.png`,
       format: "RGBA8888",

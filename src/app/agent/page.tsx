@@ -9,6 +9,7 @@
  */
 
 import Link from "next/link";
+import SiteLinks from "@/components/site-links";
 import { setLang, useLang, useT } from "@/lib/i18n";
 import { AGENT_LIMITS, AGENT_SCOPES, DEFAULT_POLICY } from "@/lib/agent-policy";
 import { DEFAULT_PALETTE } from "@/lib/palettes";
@@ -221,6 +222,8 @@ export default function AgentPage() {
         <div className="wrap head-inner">
           {MARK}
           <span>{t.landing.footer}</span>
+          <span style={{ flex: 1 }} />
+          <SiteLinks />
         </div>
       </footer>
     </main>

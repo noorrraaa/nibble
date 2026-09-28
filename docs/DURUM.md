@@ -1,5 +1,12 @@
 # NIBBLE — Durum ve Devam Notu
 
+> **2026-09-28 (portföy oturumundan):** ✅ `/gizlilik` + `/kvkk` sayfaları eklendi (metin
+> `src/lib/legal.ts`, iddialar koda karşı testli — ağ isteği/çerez/harici betik eklenirse test
+> düşer), alt bilgide Gizlilik · KVKK · Nardin. Adres kararı: **`nibble.nardin.app`**
+> (`src/lib/site.ts`; ⚠️ `nardin.app` HENÜZ ALINMADI). 🚨 Sprite sheet JSON'u `nibble.app`
+> yazıyordu — **bizim değil** (kayıtlı, park) → `SITE_URL`'e bağlandı. 265/265 test · build ·
+> tsc · eslint temiz. ⏳ Hukuki iletişim adresi boş (`LEGAL_CONTACT_EMAIL`) — sayfa "yakında" diyor.
+
 **Son güncelleme:** 2026-08-24 (5. oturum) · **Yayına alma başladı: temiz
 `next build` koştu, `git init` + ilk commit yapıldı ve repo push'landı
 (`noorrraaa/nibble`, main). Kalan: LİSANS + HOST seçimi — ikisi de kullanıcı
@@ -777,7 +784,7 @@ yükseltme. `next build` 4. oturumda çalıştırılmadı (dev sunucusu açıkt�
   lisans dosyasızlık "her hak saklı" demek olur — kimse yasal olarak
   fork/kullanamaz — ve bu, README'deki "free, no account, forever free"
   konumlandırmasıyla çelişir. Yayına çıkarken MIT tek dosya yeter.
-- **Host seçilmedi.** Statik export hazır (`out/`). GitHub Pages alt dizinde
+- **Host seçilmedi** *(adres 2026-09-28'de kararlaştı: `nibble.nardin.app` — host hâlâ açık)*. Statik export hazır (`out/`). GitHub Pages alt dizinde
   yayınlanırsa `next.config.ts`'e **`basePath` şart**; Vercel/Netlify/Cloudflare
   Pages kökten servis ederse dokunmak gerekmez.
 

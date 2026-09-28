@@ -9,6 +9,7 @@
  */
 
 import Link from "next/link";
+import SiteLinks from "@/components/site-links";
 import PixelSprite from "@/components/pixel-sprite";
 import { setLang, useLang, useT } from "@/lib/i18n";
 import { DEFAULT_PALETTE } from "@/lib/palettes";
@@ -163,6 +164,8 @@ export default function Home() {
         <div className="wrap head-inner">
           {MARK}
           <span>{t.landing.footer}</span>
+          <span style={{ flex: 1 }} />
+          <SiteLinks />
         </div>
       </footer>
     </main>

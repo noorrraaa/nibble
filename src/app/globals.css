@@ -1381,7 +1381,10 @@ kbd {
   flex-wrap: wrap;
 }
 .site-foot .head-inner {
-  padding: 0;
+  /* yalnız dikey: `padding: 0` .wrap'in yan boşluğunu da siliyordu, 390px'te
+     alt bilgi ekranın kenarına yapışıyordu */
+  padding-top: 0;
+  padding-bottom: 0;
 }
 .wordmark {
   font-family: var(--mono);
@@ -1641,4 +1644,35 @@ kbd {
     animation: none !important;
     transition: none !important;
   }
+}
+
+/* ── Hukuki sayfalar + alt bilgi bağlantıları ───────────────── */
+.legal-p {
+  font-size: 14px;
+  line-height: 1.75;
+  color: var(--muted);
+  margin: 0 0 12px;
+}
+.legal .bullets {
+  font-size: 14px;
+}
+.head-home {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: inherit;
+  text-decoration: none;
+}
+.foot-links {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 16px;
+}
+.foot-links a {
+  color: var(--muted);
+  text-decoration: none;
+}
+.foot-links a:hover {
+  color: var(--accent);
 }
