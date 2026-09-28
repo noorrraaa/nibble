@@ -102,7 +102,7 @@ export function installAgentApi(): () => void {
     if (!handshaken) {
       handshaken = true;
       s.setAgentConnected(true);
-      s.pushAgentLog("agent connected — Co-op Mode on");
+      s.pushAgentLog("agent connected: Co-op Mode on");
     }
     s.pushAgentLog(call);
   }
@@ -128,7 +128,7 @@ export function installAgentApi(): () => void {
 
     if (!limiter.take()) {
       const retryAfterMs = limiter.retryAfterMs();
-      s.pushAgentLog(`${call} — rate limited`, true);
+      s.pushAgentLog(`${call}: rate limited`, true);
       return {
         ok: false,
         error: `Rate limit: max ${AGENT_LIMITS.callsPerWindow} calls per ${AGENT_LIMITS.windowMs / 1000}s.`,
@@ -138,7 +138,7 @@ export function installAgentApi(): () => void {
     }
 
     if (scope && !s.agentPolicy.scopes[scope]) {
-      handshake(`${call} — denied (${SCOPE_LABEL[scope]})`);
+      handshake(`${call}: denied (${SCOPE_LABEL[scope]})`);
       st().pushAgentLog(`denied: ${SCOPE_LABEL[scope]}`, true);
       st().requestAgentScope(scope, call);
       return {
@@ -161,7 +161,7 @@ export function installAgentApi(): () => void {
       return fn();
     } catch (e) {
       const message = e instanceof Error ? e.message : String(e);
-      st().pushAgentLog(`${call} — failed: ${message}`, true);
+      st().pushAgentLog(`${call} failed: ${message}`, true);
       return {
         ok: false,
         error: message,
@@ -906,7 +906,7 @@ PERMISSIONS
     ): Promise<Result> {
       const verdict = classifyImageSource(src);
       if (verdict.kind === "rejected") {
-        st().pushAgentLog(`importImage — rejected: ${verdict.reason}`, true);
+        st().pushAgentLog(`importImage rejected: ${verdict.reason}`, true);
         return fail(verdict.reason, "Only data:image/*, blob: and same-origin paths are accepted.");
       }
       // uzak URL dış dünyaya istek demek → "files" izni gerekir
@@ -1293,7 +1293,7 @@ PERMISSIONS
   });
 
   console.info(
-    `%cNibble Agent API v${API_VERSION}%c  —  start with window.nibble.help()`,
+    `%cNibble Agent API v${API_VERSION}%c  ·  start with window.nibble.help()`,
     "background:#ef7d57;color:#1a1c2c;padding:2px 6px;font-weight:bold",
     "color:#94b0c2",
   );

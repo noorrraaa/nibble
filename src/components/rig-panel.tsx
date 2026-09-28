@@ -151,7 +151,7 @@ export default function RigPanel() {
             {t.rig.selected}: {active.name}
           </h4>
           <p className="hint">
-            {t.rig.handle} {activeAt ? `${activeAt.x}, ${activeAt.y}` : "—"} ·{" "}
+            {t.rig.handle} {activeAt ? `${activeAt.x}, ${activeAt.y}` : "-"} ·{" "}
             {activeRect ? `${t.rig.region} ${activeRect.w}×${activeRect.h}` : t.rig.noRegion}
           </p>
 
@@ -315,7 +315,7 @@ export default function RigPanel() {
           title={
             activeFrame >= doc.frames.length - 1 || nodes.length === 0
               ? t.rig.tweenNeedsTwo
-              : `${t.rig.tweenRun} — ${t.rig.tweenLossy}`
+              : `${t.rig.tweenRun}. ${t.rig.tweenLossy}`
           }
           onClick={() => {
             const res = tweenFrames(doc, activeFrame, tweenCount, activeLayerId);

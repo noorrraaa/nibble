@@ -236,7 +236,7 @@ export function ImportDialog({ onClose }: { onClose: () => void }) {
       setPrimary(res.palette[Math.floor(res.palette.length / 2)] ?? primary);
     }
     bump();
-    showToast(`${t.dialogs.importedToast} — ${res.width}×${res.height}, ${res.palette.length} ${t.common.colors}`);
+    showToast(`${t.dialogs.importedToast}: ${res.width}×${res.height}, ${res.palette.length} ${t.common.colors}`);
     onClose();
   };
 
@@ -505,7 +505,7 @@ export function ExportDialog({ onClose }: { onClose: () => void }) {
           disabled={!!busy}
           onClick={() => void run("gif", () => exportGif(doc))}
         >
-          <Icon name="download" size={12} /> {t.dialogs.gifLabel} — {doc.frames.length}{" "}
+          <Icon name="download" size={12} /> {t.dialogs.gifLabel} · {doc.frames.length}{" "}
           {t.common.frames} @ {doc.project.fps} fps
         </button>
         <button

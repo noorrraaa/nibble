@@ -68,7 +68,7 @@ function ToolRail({ onHelp }: { onHelp: () => void }) {
           className="tool"
           aria-pressed={tool === x.id}
           aria-label={t.tools[x.id]}
-          title={`${t.tools[x.id]} (${x.key}) — ${t.toolHelp[x.id]}`}
+          title={`${t.tools[x.id]} (${x.key}): ${t.toolHelp[x.id]}`}
           onClick={() => setTool(x.id)}
         >
           <Icon name={x.icon} />
@@ -84,7 +84,7 @@ function ToolRail({ onHelp }: { onHelp: () => void }) {
       <button
         className="tool"
         aria-pressed={rigMode}
-        title={`${t.rig.mode} (R) — ${t.rig.lead}`}
+        title={`${t.rig.mode} (R): ${t.rig.lead}`}
         aria-label={t.rig.mode}
         onClick={() => setRigMode(!rigMode)}
       >
@@ -321,7 +321,7 @@ function StatusBar() {
   return (
     <div className="statusbar">
       <span className="pos">
-        {cursor ? (inside ? `${cursor.x}, ${cursor.y}` : t.status.outside) : "—"}
+        {cursor ? (inside ? `${cursor.x}, ${cursor.y}` : t.status.outside) : "-"}
       </span>
       <span className="vrule" />
       <span>
@@ -333,7 +333,7 @@ function StatusBar() {
       </button>
       <span className="vrule" />
       <span>
-        {t.status.layer} <b>{layer?.name ?? "—"}</b>
+        {t.status.layer} <b>{layer?.name ?? "-"}</b>
         {layer?.locked ? " 🔒" : ""}
         {layer && !layer.visible ? ` (${t.common.off})` : ""}
       </span>
@@ -616,7 +616,7 @@ export default function Editor() {
           useEditor.getState().showToast(`${p.name || f.name} ✓`);
         } catch (err) {
           const why = err instanceof Error ? err.message : "";
-          useEditor.getState().showToast(`${t.dialogs.fileBroken}${why ? ` — ${why}` : ""}`);
+          useEditor.getState().showToast(`${t.dialogs.fileBroken}${why ? `: ${why}` : ""}`);
         }
       } else if (f.type.startsWith("image/")) {
         // görsel bırakıldıysa dönüştürücüyü aç — kullanıcı ne yapacağını sormasın

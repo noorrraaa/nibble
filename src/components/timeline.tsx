@@ -204,7 +204,7 @@ export default function Timeline() {
               data-active={i === activeFrame}
               aria-pressed={i === activeFrame}
               onClick={() => setActiveFrame(i)}
-              title={`${t.timeline.frame} ${i + 1} · ${csToFps(f.durationCs)} fps — ${t.timeline.dragHint}`}
+              title={`${t.timeline.frame} ${i + 1} · ${csToFps(f.durationCs)} fps · ${t.timeline.dragHint}`}
               {...dragProps(i)}
             >
               <FrameThumb index={i} cell={cell} active={i === activeFrame} />

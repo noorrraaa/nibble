@@ -41,7 +41,7 @@ export function AgentTicker({ onOpen }: { onOpen: () => void }) {
         <span className="dot" />
         <span className="live-tag">{SCOPE_ICON[request.scope]}</span>
         <span className="msg">
-          {t.agent.requestPending} <b>{t.agent.perms[request.scope]}</b> — <code>{request.call}</code>
+          {t.agent.requestPending} <b>{t.agent.perms[request.scope]}</b>: <code>{request.call}</code>
         </span>
         <span style={{ flex: 1 }} />
         <button className="btn sm primary" onClick={() => setAgentScope(request.scope, true)}>

@@ -2,7 +2,7 @@ import type { Metadata, Viewport } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Nibble — pixel art & animation editor",
+  title: "Nibble | pixel art & animation editor",
   description:
     "Free pixel art and animation editor that runs in your browser. No account, no server. AI agents can connect and draw beside you.",
   keywords: [
@@ -17,7 +17,7 @@ export const metadata: Metadata = {
     "animasyon",
   ],
   openGraph: {
-    title: "Nibble — pixel art & animation editor",
+    title: "Nibble | pixel art & animation editor",
     description:
       "No account, no server, free. AI agents connect to the site and draw beside you.",
     type: "website",

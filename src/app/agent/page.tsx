@@ -23,13 +23,13 @@ const MARK = (
   </span>
 );
 
-const FLOW = `// 1 — el sıkışma / handshake
+const FLOW = `// 1: el sıkışma / handshake
 await nibble.help()
 
-// 2 — palet / palette
+// 2: palet / palette
 nibble.usePalette("sweetie-16")
 
-// 3 — tek çağrıda bir sprite / a whole sprite in one call
+// 3: tek çağrıda bir sprite / a whole sprite in one call
 nibble.drawFromText({
   rows: [
     "..AAAA..",
@@ -43,12 +43,12 @@ nibble.drawFromText({
   x: 12, y: 12,
 })
 
-// 4 — animasyon / animation
+// 4: animasyon / animation
 nibble.addFrame({ copyFrom: 0 })
 nibble.setPixels([{ x: 12, y: 11, c: 3 }])
 nibble.setFps(10)
 
-// 5 — ne çizdiğini oku / read back what you drew
+// 5: ne çizdiğini oku / read back what you drew
 nibble.readCanvas()`;
 
 const RIG_FLOW = `// bir parçaya isim ver / name a part: tutamak + piksel kutusu
@@ -75,7 +75,7 @@ const REFERENCE: [string, string][] = [
   ["help(topic?)", "API + canvas state + a hint for what to do next"],
   ["getState() · describe()", "Canvas, frames, layers, palette, parts, permissions"],
   ["getPermissions()", "What you are currently allowed to do"],
-  ["readCanvas(frame?)", "Reads back rows + legend — same format you write"],
+  ["readCanvas(frame?)", "Reads back rows + legend, in the same format you write"],
   ["drawFromText({rows, legend, x, y})", "Draw a whole sprite in one call"],
   ["setPixels([{x, y, c}])", "Bulk pixel writes"],
   ["fill(x, y, c, opts?)", "Flood fill"],
@@ -87,8 +87,8 @@ const REFERENCE: [string, string][] = [
   ["getPalette() · setPalette([]) · usePalette(id)", "Colour palette"],
   ["definePart({name, x, y, box?})", "Name a part: a handle plus the pixels it carries"],
   ["setPartBox(name, box) · clearPartBox(name)", "Attach or detach the pixel box"],
-  ["setPartHandle(name, x, y)", "Move the handle only — this is how you key a pose"],
-  ["movePart(name, dx, dy, opts?)", "Move handle AND pixels — one undo step"],
+  ["setPartHandle(name, x, y)", "Move the handle only. This is how you key a pose"],
+  ["movePart(name, dx, dy, opts?)", "Move handle AND pixels in one undo step"],
   ["flipPart(name, axis) · rotatePart(name, deg)", "90° multiples lossless, other angles are not"],
   ["recolorPart(name, {to, from?, tolerance?})", "Repaint just that part"],
   ["renamePart(a, b) · deletePart(name)", "Edit the part list"],
@@ -98,10 +98,10 @@ const REFERENCE: [string, string][] = [
   ["importImage(src, opts?)", "Image → pixel art (data:/blob: free, http(s) needs files)"],
   ["beginBatch(label) · endBatch()", "Group everything into one undo step"],
   ["undo() · redo()", "History"],
-  ["exportGif() · exportPng()", "Downloads — needs the files permission"],
+  ["exportGif() · exportPng()", "Downloads (needs the files permission)"],
   ["exportApng()", "Lossless animation: full RGBA alpha, no 256-colour limit"],
-  ["exportSpriteSheet()", "PNG + Aseprite JSON — rig parts become Aseprite \"slices\""],
-  ["resize(w, h) · newProject() · deleteFrame(i) · deleteLayer(id)", "Destructive — off by default"],
+  ["exportSpriteSheet()", "PNG + Aseprite JSON; rig parts become Aseprite \"slices\""],
+  ["resize(w, h) · newProject() · deleteFrame(i) · deleteLayer(id)", "Destructive, off by default"],
 ];
 
 export default function AgentPage() {
@@ -153,7 +153,7 @@ export default function AgentPage() {
         <pre className="code">{FLOW}</pre>
 
         <h2 className="doc-h2">
-          {t.rig.title} — {lang === "tr" ? "parça adıyla konuş" : "speak in part names"}
+          {t.rig.title}: {lang === "tr" ? "parça adıyla konuş" : "speak in part names"}
         </h2>
         <p className="hero-lede" style={{ fontSize: 16, marginBottom: 16 }}>
           {lang === "tr"
@@ -178,7 +178,7 @@ export default function AgentPage() {
                   <b>
                     {t.agent.perms[scope]}{" "}
                     <span className="hint">
-                      — {lang === "tr" ? "varsayılan" : "default"}: {on ? t.common.on : t.common.off}
+                      · {lang === "tr" ? "varsayılan" : "default"}: {on ? t.common.on : t.common.off}
                     </span>
                   </b>
                   <span className="hint">{t.agent.perms[`${scope}Desc`]}</span>

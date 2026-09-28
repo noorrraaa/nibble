@@ -3,7 +3,7 @@ import LegalPage from "@/components/legal-page";
 import { privacyDoc } from "@/lib/legal";
 
 export const metadata: Metadata = {
-  title: "Gizlilik Politikası — Nibble",
+  title: "Gizlilik Politikası | Nibble",
   description: "Nibble'da çizimlerin cihazında kalır: hesap yok, sunucu yok, çerez ve izleme yok.",
 };
 

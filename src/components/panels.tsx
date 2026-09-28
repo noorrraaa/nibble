@@ -180,7 +180,7 @@ export function PalettePanel() {
                       className="sw"
                       style={{ background: c }}
                       aria-label={`${t.common.rename} ${c}`}
-                      title={`${c} — ${t.palette.editHint}`}
+                      title={`${c}: ${t.palette.editHint}`}
                       onClick={() => setDraft({ index: ci, value: c })}
                     />
                     <button

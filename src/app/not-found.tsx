@@ -7,7 +7,7 @@
 import Link from "next/link";
 
 export const metadata = {
-  title: "Sayfa bulunamadı — Nibble",
+  title: "Sayfa bulunamadı | Nibble",
 };
 
 export default function NotFound() {
@@ -16,7 +16,7 @@ export default function NotFound() {
       <article className="wrap doc legal">
         <h1 className="doc-title">Bu sayfa yok</h1>
         <p className="hero-lede">
-          Aradığın adres taşınmış ya da hiç olmamış olabilir. Çizimlerin yerinde —
+          Aradığın adres taşınmış ya da hiç olmamış olabilir. Çizimlerin yerinde:
           onlar bu tarayıcıda duruyor, adresle ilgisi yok.
         </p>
         <p>
