@@ -1,10 +1,22 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
+import { pageMetadata } from "@/lib/seo";
+import { SITE_URL } from "@/lib/site";
 
-export const metadata: Metadata = {
+/**
+ * Ana sayfanın üst bilgisi burada (sayfa "use client" olduğu için metadata veremiyor).
+ * Kanonik adres ve kart `pageMetadata` ile; alt sayfalar kendilerininkini veriyor.
+ */
+const home = pageMetadata({
+  path: "/",
   title: "Nibble | pixel art & animation editor",
   description:
     "Free pixel art and animation editor that runs in your browser. No account, no server. AI agents can connect and draw beside you.",
+});
+
+export const metadata: Metadata = {
+  metadataBase: new URL(SITE_URL),
+  ...home,
   keywords: [
     "pixel art",
     "pixel art editor",
@@ -17,10 +29,8 @@ export const metadata: Metadata = {
     "animasyon",
   ],
   openGraph: {
-    title: "Nibble | pixel art & animation editor",
-    description:
-      "No account, no server, free. AI agents connect to the site and draw beside you.",
-    type: "website",
+    ...home.openGraph,
+    description: "No account, no server, free. AI agents connect to the site and draw beside you.",
   },
   other: { "ai-tools": "/llms.txt" },
 };
