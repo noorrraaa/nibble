@@ -6,7 +6,8 @@
 
 Nibble runs entirely in your browser. There is no backend, no sign-up, no upload
 and no paid tier. Your work lives in your own browser (IndexedDB) and never
-leaves it.
+leaves it. The only thing the site measures is visits, with cookieless
+Cloudflare Web Analytics (aggregate counts, no identification; see `/gizlilik/`).
 
 > 1 nibble = 4 bits = 16 values = the classic 16-colour pixel art palette.
 
@@ -95,7 +96,7 @@ possible, and pretending otherwise would be dishonest. What Nibble does instead:
 ```sh
 npm install
 npm run dev          # http://localhost:3000
-npm test             # 257 tests, no test framework dependency
+npm test             # 294 tests, no test framework dependency
 npm run lint
 npm run typecheck
 npm run build        # static export → out/   (stop `npm run dev` first: same .next)
@@ -114,11 +115,11 @@ src/
                  exporters · apng · image-to-pixels · palettes · storage
                  editor-store · agent-api · agent-policy · i18n · showcase-sprites
 docs/            PLAN.md · DURUM.md · landing-concept.html
-public/llms.txt  what an agent reads first
+public/          llms.txt (what an agent reads first) · llms-full.txt (full reference) · icons, og.png
 ```
 
 Tests sit next to the code as `*.test.ts` and run on `node --test` after a
-TypeScript compile — no Jest, no Vitest, zero extra dependencies. 257 of them,
+TypeScript compile — no Jest, no Vitest, zero extra dependencies. 294 of them,
 and the ones that matter most are the boring ones: the undo contract, APNG byte
 layout, `.nibble` file validation, and the permission wall's URL table.
 

@@ -12,7 +12,7 @@
   --line: #383d5c;
   --ink: #f4f4f4;
   --muted: #94b0c2;
-  --dim: #6a7594;
+  --dim: #828daa; /* AA: zemin 5.4, yüzey 4.6 (eski #6a7594 3.3-3.9 idi) */
 
   --coral: #ef7d57;
   --crim: #b13e53;
@@ -38,7 +38,7 @@
   --line: #c9cfdd;
   --ink: #1a1c2c;
   --muted: #566c86;
-  --dim: #8695ac;
+  --dim: #5f6e86; /* AA: beyaz 5.2, zemin 4.3 (eski #8695ac 2.6-3.0 idi) */
   --coral: #d9583a;
   --crim: #a02f45;
   --gold: #c98b1e;
@@ -1675,4 +1675,17 @@ kbd {
 }
 .foot-links a:hover {
   color: var(--accent);
+}
+
+/* Yalnız ekran okuyuculara görünen metin */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
 }

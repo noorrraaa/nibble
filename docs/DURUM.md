@@ -1,16 +1,39 @@
 # NIBBLE — Durum ve Devam Notu
 
+> **2026-09-29 (analitik + keşfedilebilirlik turu, commit'lendi, push/deploy YOK):**
+> - ✅ **Cloudflare Web Analytics** (token `site.ts` → `CF_ANALYTICS_TOKEN`), kök layout'ta tek
+>   `<script defer>`, yalnız `NODE_ENV=production`. CSP `script-src`'ye
+>   `https://static.cloudflareinsights.com` eklendi, `connect-src https:` duruyor.
+>   ⚠️ Yerelde (`npx serve out`) beacon CORS hatası verir (token yalnız nibble.nardin.app için): beklenen.
+> - ✅ **Gizlilik + KVKK yeniden yazıldı** (yürürlük 29 Eylül 2026): çerezsiz sayaç, ne gönderdiği,
+>   sağlayıcı Cloudflare, Inc. (ABD), KVKK §5'te yurt dışı aktarım (m.9), barındırma Türkiye'de
+>   (IP whois TR). Metindeki https adresleri ve e-posta tıklanabilir. Ana sayfa maddesi
+>   "Sunucuya hiçbir şey gitmez" artık yanlış olacağı için **"Çerez yok" / "No cookies"** oldu.
+> - ✅ **Ajanlar için:** `public/llms.txt` llmstxt.org biçimine çevrildi (kısa + bağlantılar),
+>   eski tam içerik `public/llms-full.txt`'te (ürün, bağlantı, izinler, sınırlar, gizlilik özeti).
+>   Ana sayfada JSON-LD `WebApplication` (`lib/structured-data.ts`). robots.txt'de 12 yapay zekâ
+>   tarayıcısı adıyla izinli (`seo.ts` → `AI_CRAWLERS`).
+> - ✅ **Canlıda 404 veren `/favicon.ico` düzeltildi:** `src/app/favicon.ico` + `icon.svg` +
+>   `apple-icon.png`, `public/icon-192/512.png`, `manifest.ts` (üretici: `node scripts/make-icons.mjs`).
+>   nginx: `.webmanifest` türü + `charset utf-8` (llms.txt'deki "Kızak" bozuk görünüyordu).
+> - ✅ Erişilebilirlik: editöre ekran okuyucu `h1`; `--dim` metin rengi AA'ya çekildi
+>   (koyu 3.3-3.9 → 4.6-5.4, açık 2.6-3.0 → 4.3-5.2). 404 ve KVKK açıklamaları düzeldi.
+> - Doğrulama: **294/294 test** · tsc · eslint · `next build` temiz. Headless Chrome (1280 + 390):
+>   `/`, `/editor/`, `/gizlilik/`, `/kvkk/`, `/agent/`, 404: 4xx istek yok (beacon CORS hariç).
+> - ⏳ Sende: **Coolify'da Redeploy** (push deploy etmiyor), sonra canlıda `curl -I /favicon.ico`,
+>   `/llms-full.txt`, `/manifest.webmanifest` ve Cloudflare panelinde ziyaretin düştüğünü gör.
+>   nginx yapılandırması yerelde denenemedi (nginx/Docker yok): Redeploy loguna bak.
+
 > **2026-09-28 (portföy oturumundan):** ✅ `/gizlilik` + `/kvkk` sayfaları eklendi (metin
-> `src/lib/legal.ts`, iddialar koda karşı testli — ağ isteği/çerez/harici betik eklenirse test
-> düşer), alt bilgide Gizlilik · KVKK · Nardin. Adres kararı: **`nibble.nardin.app`**
-> (`src/lib/site.ts`; ⚠️ `nardin.app` HENÜZ ALINMADI). 🚨 Sprite sheet JSON'u `nibble.app`
-> yazıyordu — **bizim değil** (kayıtlı, park) → `SITE_URL`'e bağlandı. 265/265 test · build ·
-> tsc · eslint temiz. ⏳ Hukuki iletişim adresi boş (`LEGAL_CONTACT_EMAIL`) — sayfa "yakında" diyor.
+> `src/lib/legal.ts`, iddialar koda karşı testli). Adres kararı: **`nibble.nardin.app`**
+> (`src/lib/site.ts`; ✅ 2026-09-29: domain alındı, site canlı, Coolify'da). 🚨 Sprite sheet
+> JSON'u `nibble.app` yazıyordu — **bizim değil** (kayıtlı, park) → `SITE_URL`'e bağlandı.
+> ✅ Hukuki iletişim adresi yazıldı: `thecrimelogs.contact@gmail.com`.
 
 **Son güncelleme:** 2026-08-24 (5. oturum) · **Yayına alma başladı: temiz
 `next build` koştu, `git init` + ilk commit yapıldı ve repo push'landı
-(`noorrraaa/nibble`, main). Kalan: LİSANS + HOST seçimi — ikisi de kullanıcı
-kararı (§13).** Proje `~/Desktop/hayat/nibble` altına taşındı.
+(`noorrraaa/nibble`, main). Kalan: LİSANS (kullanıcı kararı, §13). ✅ HOST: Coolify
+(2026-09-28, `ERISIM.md`).** Proje `~/Desktop/hayat/nibble` altına taşındı.
 
 4. oturum (2026-08-21): repo düzeni + README + dosya dosya güvenlik denetimi —
 iki güvenlik açığı, dört sessiz veri/geçmiş hatası ve bir performans gerilemesi
@@ -748,7 +771,7 @@ Keyfi açı döndürme kutuyu 2048'in üstüne büyütemiyor (sınırlı, çökm
 `exporters`/`image-to-pixels` istisna metinleri Türkçe ve İngilizce arayüzde de
 öyle görünüyor — bu dosyalardaki eski davranışla tutarlı, ayrı bir i18n işi.
 
-**Kalan bilinen durum:** `npm audit` hâlâ 3 high (postcss, sharp) — dev
+**Kalan bilinen durum:** ✅ 2026-09-29'da kapandı (`npm audit` 0, commit 4b8609b). Eski not: `npm audit` 3 high (postcss, sharp) — dev
 bağımlılığı, bu üründe sömürülebilir değil, düzeltmesi Next 16'ya kırıcı
 yükseltme. `next build` 4. oturumda çalıştırılmadı (dev sunucusu açıktı; ikisi aynı
 `.next`'i kullanıyor) — **5. oturumda koşuldu ve temiz geçti**, bkz. §13.
@@ -777,14 +800,14 @@ yükseltme. `next build` 4. oturumda çalıştırılmadı (dev sunucusu açıkt�
    `~/Desktop/hayat/` altında açılan her repo kişisel kimliği `~/.gitconfig`
    içindeki `includeIf gitdir:~/Desktop/hayat/` kuralıyla otomatik alıyor.
 
-### 3. adım: LİSANS + HOST — kullanıcı kararı, hâlâ açık
+### 3. adım: LİSANS (hâlâ açık) + HOST (✅ Coolify, 2026-09-28)
 
 - **Lisans yok.** Repo **private** olduğu için şu an aciliyeti yok
   (kullanıcı 2026-08-24'te teyit etti). Ama repo public'e çevrildiği gün
   lisans dosyasızlık "her hak saklı" demek olur — kimse yasal olarak
   fork/kullanamaz — ve bu, README'deki "free, no account, forever free"
   konumlandırmasıyla çelişir. Yayına çıkarken MIT tek dosya yeter.
-- **Host seçilmedi** *(adres 2026-09-28'de kararlaştı: `nibble.nardin.app` — host hâlâ açık)*. Statik export hazır (`out/`). GitHub Pages alt dizinde
+- ✅ **Host: Coolify** (2026-09-28, Dockerfile + nginx, `ERISIM.md`). Eski not: Statik export hazır (`out/`). GitHub Pages alt dizinde
   yayınlanırsa `next.config.ts`'e **`basePath` şart**; Vercel/Netlify/Cloudflare
   Pages kökten servis ederse dokunmak gerekmez.
 

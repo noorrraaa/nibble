@@ -6,7 +6,7 @@ import { privacyDoc } from "@/lib/legal";
 export const metadata: Metadata = pageMetadata({
   path: "/gizlilik/",
   title: "Gizlilik Politikası | Nibble",
-  description: "Nibble'da çizimlerin cihazında kalır: hesap yok, sunucu yok, çerez ve izleme yok.",
+  description: "Nibble'da çizimlerin cihazında kalır: hesap yok, sunucu yok, çerez yok. Yalnız çerezsiz, toplu ziyaret sayımı var.",
 });
 
 export default function PrivacyPage() {

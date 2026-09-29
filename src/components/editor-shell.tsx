@@ -637,6 +637,8 @@ export default function Editor() {
 
   return (
     <div className={`app${focusMode ? " focus" : ""}`}>
+      {/* Ekran okuyucu ve tarayıcılar için sayfa başlığı; görsel başlık üst bardaki logo. */}
+      <h1 className="sr-only">Nibble pixel art editor</h1>
       <TopBar open={setDialog} />
       <div className="main">
         <ToolRail onHelp={() => setDialog("help")} />

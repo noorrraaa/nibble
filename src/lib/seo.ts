@@ -62,3 +62,24 @@ export const SITEMAP_ROUTES = ["/", "/editor/", "/agent/", "/gizlilik/", "/kvkk/
 export function absoluteUrl(path: string): string {
   return new URL(path, SITE_URL).toString();
 }
+
+/**
+ * robots.txt'de adıyla izin verilen yapay zekâ tarayıcıları. Arama (OAI-SearchBot,
+ * Claude-SearchBot, PerplexityBot), kullanıcı adına anlık okuma (ChatGPT-User,
+ * Claude-User, Perplexity-User) ve eğitim (GPTBot, ClaudeBot, Google-Extended,
+ * Applebot-Extended, CCBot) ayrı ajanlar; hepsine açık.
+ */
+export const AI_CRAWLERS = [
+  "GPTBot",
+  "OAI-SearchBot",
+  "ChatGPT-User",
+  "ClaudeBot",
+  "Claude-User",
+  "Claude-SearchBot",
+  "PerplexityBot",
+  "Perplexity-User",
+  "Google-Extended",
+  "Applebot-Extended",
+  "CCBot",
+  "Bingbot",
+] as const;

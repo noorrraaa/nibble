@@ -10,9 +10,10 @@ import { OG_IMAGE, SITE_NAME } from "@/lib/seo";
 
 export const metadata: Metadata = {
   title: "Sayfa bulunamadı | Nibble",
+  description: "Bu adreste bir sayfa yok. Nibble ana sayfasına ya da editöre dönebilirsin.",
   // Kök layout ana sayfanın kanonik adresini ve kartını taşıyor; 404 onları miras almasın.
   alternates: { canonical: null },
-  openGraph: { siteName: SITE_NAME, title: "Sayfa bulunamadı | Nibble", images: [OG_IMAGE] },
+  openGraph: { siteName: SITE_NAME, title: "Sayfa bulunamadı | Nibble", description: "Bu adreste bir sayfa yok.", images: [OG_IMAGE] },
   twitter: { card: "summary_large_image", title: "Sayfa bulunamadı | Nibble", images: [OG_IMAGE.url] },
 };
 

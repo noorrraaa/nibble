@@ -1,148 +1,45 @@
 # Nibble
 
-> A free, account-free pixel art and animation editor that runs entirely in the
-> browser. This site is designed to BE USED BY AI agents, not to sell you AI.
-> Nothing is sent to a server; there is no backend.
+> Nibble is a free, account-free pixel art and animation editor that runs
+> entirely in the browser, built to be used by AI agents. No backend: drawings
+> stay in the browser's IndexedDB. The user's own browser agent draws through a
+> JavaScript API at `window.nibble` on the editor page.
 
-## How to use it as an agent
+Nibble does not sell AI generation; it invites the user's own agent (for
+example Claude in Chrome). Open https://nibble.nardin.app/editor/ and call
+`window.nibble.help()` first: that call is the handshake, the UI switches to
+Co-op Mode and the user sees a live ticker of every call. `help(topic)` covers
+drawing, animation, rig, palette, export, project and permissions.
 
-Open the editor page: /editor/
+Golden rules for agents:
 
-That page exposes a global object, `window.nibble`. The first call is always:
+1. Draw a whole sprite with one `drawFromText({ rows, legend, x, y })` call,
+   never pixel by pixel.
+2. Wrap multi-step work in `beginBatch("label")` / `endBatch()`: one Ctrl+Z
+   undoes all of it.
+3. Call `readCanvas()` to check your work; it returns the format you write.
+4. Read the `hint` field on every return value.
+5. A denied call (`{ ok: false, deniedScope }`) is an answer: ask the user to
+   allow the scope, do not work around it. `destructive` and `files` are off by
+   default.
+6. To animate, name parts once (`definePart`) and move them by name
+   (`movePart`, `tween`).
 
-    window.nibble.help()
+## Docs
 
-That call is a handshake: the site detects you, the UI switches to "Co-op Mode"
-and the user sees a live ticker of everything you do. `help()` is not just an
-API listing — it also returns advice based on the current canvas state.
+- [Full agent reference (plain text)](https://nibble.nardin.app/llms-full.txt): every call, permissions, limits, rig, export formats, typical flow
+- [Agent API page](https://nibble.nardin.app/agent/): the same reference for humans, with copyable examples
+- [Editor](https://nibble.nardin.app/editor/): where `window.nibble` lives
 
-Deeper topics:
-help("drawing") | help("animation") | help("rig") | help("palette")
-help("export") | help("project") | help("permissions")
+## About
 
-## Golden rules
+- [Home](https://nibble.nardin.app/): what Nibble is; free, no account, no server
+- [Privacy policy (Turkish)](https://nibble.nardin.app/gizlilik/): drawings never leave the browser; cookieless Cloudflare Web Analytics counts visits
+- [KVKK notice (Turkish)](https://nibble.nardin.app/kvkk/)
+- [Nardin](https://nardin.app): the independent developer (Emre Kızak) behind Nibble
 
-1. NEVER send pixels one at a time. Draw a whole sprite with one `drawFromText`
-   call. Clicking pixel by pixel on a 32x32 canvas would be 1024 actions.
-2. Wrap multi-step work in `beginBatch("label")` / `endBatch()` so the user can
-   undo everything you did with a single Ctrl+Z.
-3. Call `readCanvas()` to see what you drew. It returns exactly the format you
-   write, so you can check and correct yourself without screenshots.
-4. Read the `hint` field on every return value — the site actively coaches you.
-5. A denied call is an answer, not an obstacle. Do not look for a way around the
-   permission system; ask the user to grant the scope and retry.
-6. To animate, name the moving parts once and move them by name. See the rig
-   section below — it is the difference between one call and a thousand.
+## Optional
 
-## The rig: name the parts, then move them by name
-
-This is the highest-leverage part of the API and the reason Nibble exists in
-this shape. Redrawing a sprite once per frame is the most expensive way to
-animate. Instead, name a chunk of the sprite once:
-
-    nibble.definePart({
-      name: "left_leg",
-      x: 12, y: 24,                        // the handle
-      box: { x: 10, y: 22, w: 5, h: 8 },   // the pixels it carries
-    })
-
-From then on you speak in parts, not pixels:
-
-    nibble.movePart("left_leg", 0, -2)     // handle AND pixels, one undo step
-    nibble.flipPart("left_leg", "x")       // lossless
-    nibble.rotatePart("left_leg", 90)      // 90° multiples lossless
-    nibble.recolorPart("left_leg", { to: "#b13e53" })
-
-Key the poses and let Nibble fill in the frames between them:
-
-    nibble.addFrame({ copyFrom: 0 })
-    nibble.movePart("left_leg", 0, -3)
-    nibble.setActiveFrame(0)
-    nibble.tween({ count: 2 })
-
-`setPartHandle(name, x, y)` moves the handle WITHOUT the pixels — that is how
-you key a pose you want to interpolate towards. `defineBone({name, from, to})`
-records that two parts are attached; it draws a line and gives you structure to
-reason about. `describeRig()` tells you which parts are still missing a handle
-or a box.
-
-tween() does TRANSLATION ONLY — no squashing, bending or mesh warping. Pixel art
-turns to mud when you deform it, so this is deliberate, not a limitation to work
-around. Expect to touch up in-betweens by hand where it matters. If the parts
-only travel a pixel or two, the in-betweens land on the same pixels and the
-return value says so.
-
-## Permissions
-
-The user owns a set of switches. Every call is checked against them.
-
-    draw         on  by default   paint, flood fill, clear the current frame
-    animate      on  by default   frames, fps, playback
-    layers       on  by default   add / show / hide / lock / rename layers
-    palette      on  by default   change the project palette
-    destructive  OFF by default   resize, newProject, deleteFrame, deleteLayer
-    files        OFF by default   downloads, loading images from a URL
-
-A denied call returns `{ ok: false, error, hint, deniedScope }` — it does not
-throw. The editor simultaneously shows the user a request they can approve.
-
-Call `getPermissions()` at any time to see what you are currently allowed to do.
-
-Things that are deliberately NOT in the API: the user's saved drafts, storage,
-settings, and any file system access. There is no way to list, open or delete
-the user's other projects.
-
-## Limits
-
-    rate limit          120 calls per 10 seconds
-    drawFromText        max 4096 rows, 4096 characters per row, 512 legend keys
-    setPixels           max 250 000 pixels per call
-    canvas              max 512 x 512
-    part box            max 2048 x 2048 (a box is a pixel buffer, so it is capped)
-    importImage         data:, blob: and same-origin paths are free; anything
-                        that resolves to another origin needs "files" - and the
-                        check runs on the RESOLVED url, so obfuscating the
-                        scheme does not get you past it
-
-Everything you do lands in the undo history as a single step per call (or per
-batch), so the user can always take it back.
-
-## Typical flow
-
-    nibble.help()
-    nibble.usePalette("sweetie-16")
-    nibble.beginBatch("bouncing slime")
-    nibble.drawFromText({
-      rows: ["..DDDD..", ".DLLLLD.", "DLWLLWLD", ".DDLLDD."],
-      legend: { D: 7, L: 6, W: 12 },
-      x: 12, y: 10
-    })
-    nibble.addFrame({ copyFrom: 0 })
-    nibble.setPixels([{ x: 12, y: 11, c: 6 }])
-    nibble.setFps(10)
-    nibble.endBatch()
-    nibble.readCanvas()
-
-`legend` values are either palette indices (numbers) or hex strings such as
-"#ff0044". The character "." means transparent.
-
-## Pages
-
-- /            landing page, what Nibble is
-- /editor/     the editor — this is where window.nibble lives
-- /agent/      human- and agent-readable API reference
-
-## Facts worth knowing
-
-- Valid FPS values are 5, 10, 12.5, 20, 25, 50 — exactly the ones where 100/fps
-  is a whole number of centiseconds, which is the unit GIF stores frame delay in.
-  (12.5 fps is 8 cs. 60 fps would be 1.67 cs and the animation would drift, so
-  setFps(60) rounds to 50 and tells you so.)
-- Layers are global to the project (the Aseprite model), not per frame.
-- Exports: PNG, animated GIF, animated APNG, sprite sheet with Aseprite-compatible
-  JSON that Godot and Unity importers read directly, and a .nibble project file.
-- exportGif() is limited to 256 colours and 1-bit alpha; exportApng() has neither
-  limit and is lossless. Prefer APNG when the sprite has soft edges or many colours.
-- Rig parts are written into the sprite sheet JSON as Aseprite "slices" (name +
-  per-frame bounds + pivot), so the names you choose survive the export.
-- The editor UI is bilingual (Turkish / English). This API is English only.
+- Exports: PNG, animated GIF, lossless APNG, sprite sheet with Aseprite-compatible JSON (Godot, Unity), `.nibble` project file
+- Valid fps: 5, 10, 12.5, 20, 25, 50 (GIF stores delay in centiseconds)
+- Limits: 120 calls per 10 s, canvas up to 512 x 512, 250 000 pixels per `setPixels` call

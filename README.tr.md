@@ -6,6 +6,8 @@
 
 Nibble tamamen tarayıcıda çalışır. Backend yok, kayıt yok, yükleme yok, ücretli
 paket yok. Çalışman kendi tarayıcında (IndexedDB) durur ve hiçbir yere gitmez.
+Sitenin ölçtüğü tek şey ziyaret sayısı: çerezsiz Cloudflare Web Analytics (toplu
+sayım, kimlik yok; bkz. `/gizlilik/`).
 
 > 1 nibble = 4 bit = 16 değer = pixel art'ın klasik 16 renkli paleti.
 
@@ -99,7 +101,7 @@ değil ve öyleymiş gibi yapmak dürüst olmaz. Nibble bunun yerine şunu yapı
 ```sh
 npm install
 npm run dev          # http://localhost:3000
-npm test             # 257 test, test kütüphanesi bağımlılığı yok
+npm test             # 294 test, test kütüphanesi bağımlılığı yok
 npm run lint
 npm run typecheck
 npm run build        # statik export → out/   (önce `npm run dev`'i kapat: aynı .next)
@@ -118,12 +120,12 @@ src/
                  exporters · apng · image-to-pixels · palettes · storage
                  editor-store · agent-api · agent-policy · i18n · showcase-sprites
 docs/            PLAN.md · DURUM.md · landing-concept.html
-public/llms.txt  ajanın ilk okuduğu dosya
+public/          llms.txt (ajanın ilk okuduğu) · llms-full.txt (tam başvuru) · simgeler, og.png
 ```
 
 Testler kodun yanında `*.test.ts` olarak duruyor ve TypeScript derlemesinden
 sonra `node --test` ile koşuyor — Jest yok, Vitest yok, sıfır ek bağımlılık.
-257 test var ve en değerlileri sıkıcı olanlar: geri-alma sözleşmesi, APNG bayt
+294 test var ve en değerlileri sıkıcı olanlar: geri-alma sözleşmesi, APNG bayt
 düzeni, `.nibble` doğrulaması ve izin duvarının URL tablosu.
 
 ## Bilinçli kararlardan birkaçı

@@ -1,7 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import { pageMetadata } from "@/lib/seo";
-import { SITE_URL } from "@/lib/site";
+import { CF_ANALYTICS_SCRIPT, CF_ANALYTICS_TOKEN, SITE_URL } from "@/lib/site";
 
 /**
  * Ana sayfanın üst bilgisi burada (sayfa "use client" olduğu için metadata veremiyor).
@@ -33,7 +33,16 @@ export const metadata: Metadata = {
     description: "No account, no server, free. AI agents connect to the site and draw beside you.",
   },
   other: { "ai-tools": "/llms.txt" },
+  // Simgeler: src/app/icon.svg + favicon.ico + apple-icon.png, manifest: src/app/manifest.ts.
+  // Next bağlantılarını dosyalardan kendisi basıyor (scripts/make-icons.mjs üretiyor).
 };
+
+/**
+ * Cloudflare Web Analytics: çerezsiz, kimliksiz, toplu sayım (gizlilik metni §3).
+ * Yalnız üretim derlemesinde; `npm run dev` ziyaretleri sayılmaz.
+ * CSP'de script-src'ye static.cloudflareinsights.com eklendi (security-headers.conf).
+ */
+const ANALYTICS = process.env.NODE_ENV === "production";
 
 export const viewport: Viewport = {
   themeColor: "#14161f",
@@ -70,7 +79,16 @@ export default function RootLayout({
       <head>
         <script dangerouslySetInnerHTML={{ __html: THEME_BOOTSTRAP }} />
       </head>
-      <body>{children}</body>
+      <body>
+        {children}
+        {ANALYTICS && (
+          <script
+            defer
+            src={CF_ANALYTICS_SCRIPT}
+            data-cf-beacon={JSON.stringify({ token: CF_ANALYTICS_TOKEN })}
+          />
+        )}
+      </body>
     </html>
   );
 }

@@ -414,7 +414,7 @@ const en = {
     ctaAlt: "HOW DO I CONNECT AI?",
     bullets: [
       "No sign-up",
-      "Nothing leaves your browser",
+      "No cookies",
       "Your work stays local",
       "Completely free",
     ],
@@ -885,7 +885,7 @@ const tr: Dict = {
     ctaAlt: "AI İLE NASIL BAĞLANIR?",
     bullets: [
       "Kayıt gerekmez",
-      "Sunucuya hiçbir şey gitmez",
+      "Çerez yok",
       "Çalışman tarayıcında kalır",
       "Tamamen ücretsiz",
     ],

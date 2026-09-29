@@ -14,6 +14,10 @@ import PixelSprite from "@/components/pixel-sprite";
 import { setLang, useLang, useT } from "@/lib/i18n";
 import { DEFAULT_PALETTE } from "@/lib/palettes";
 import { MASCOT, OBJECTS, SCENES } from "@/lib/showcase-sprites";
+import { jsonLdScript, webApplicationJsonLd } from "@/lib/structured-data";
+
+// Derlemede tek sefer üretilen, sabit JSON-LD (dile bağlı değil: hidrasyon aynı).
+const JSON_LD = jsonLdScript(webApplicationJsonLd());
 
 const MARK = (
   <span className="mark" aria-hidden>
@@ -42,6 +46,7 @@ export default function Home() {
 
   return (
     <main style={{ minHeight: "100dvh" }}>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON_LD }} />
       <header className="site-head">
         <div className="wrap head-inner">
           {MARK}

@@ -5,7 +5,7 @@
  */
 
 import Link from "next/link";
-import type { LegalDoc } from "@/lib/legal";
+import { linkSegments, type LegalDoc } from "@/lib/legal";
 import { NARDIN_URL } from "@/lib/site";
 
 const MARK = (
@@ -16,6 +16,19 @@ const MARK = (
     <i /><i /><i /><i />
   </span>
 );
+
+/** Metindeki https adreslerini ve e-postaları tıklanabilir yapar (bölme `legal.ts`'de, testli). */
+function linkify(text: string): React.ReactNode[] {
+  return linkSegments(text).map((seg, i) =>
+    seg.href ? (
+      <a key={i} href={seg.href} rel={seg.href.startsWith("https://") ? "noopener" : undefined}>
+        {seg.text}
+      </a>
+    ) : (
+      seg.text
+    ),
+  );
+}
 
 export default function LegalPage({ doc }: { doc: LegalDoc }) {
   return (
@@ -43,13 +56,13 @@ export default function LegalPage({ doc }: { doc: LegalDoc }) {
             <h2 className="doc-h2">{s.heading}</h2>
             {s.paragraphs?.map((p, i) => (
               <p key={i} className="legal-p">
-                {p}
+                {linkify(p)}
               </p>
             ))}
             {s.bullets && (
               <ul className="bullets">
                 {s.bullets.map((b, i) => (
-                  <li key={i}>{b}</li>
+                  <li key={i}>{linkify(b)}</li>
                 ))}
               </ul>
             )}
