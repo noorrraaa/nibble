@@ -172,16 +172,20 @@ batch), so the user can always take it back.
   aggregate counts of page URL, referrer, browser and OS type, and country.
 - If a user connects their own agent, what that agent sends to its own provider
   is between the user and that provider.
-- Full policy (Turkish): https://nibble.nardin.app/gizlilik/
-- KVKK notice (Turkish): https://nibble.nardin.app/kvkk/
+- Full policy (English): https://nibble.nardin.app/privacy/
+  Turkish original, which prevails: https://nibble.nardin.app/gizlilik/
+- KVKK notice (English): https://nibble.nardin.app/kvkk/en/
+  Turkish original, which prevails: https://nibble.nardin.app/kvkk/
 
 ## Pages
 
 - https://nibble.nardin.app/          landing page, what Nibble is
 - https://nibble.nardin.app/editor/   the editor, this is where window.nibble lives
 - https://nibble.nardin.app/agent/    human- and agent-readable API reference
-- https://nibble.nardin.app/gizlilik/ privacy policy (Turkish)
-- https://nibble.nardin.app/kvkk/     KVKK notice (Turkish)
+- https://nibble.nardin.app/privacy/  privacy policy (English translation)
+- https://nibble.nardin.app/gizlilik/ privacy policy (Turkish original)
+- https://nibble.nardin.app/kvkk/en/  KVKK notice (English translation)
+- https://nibble.nardin.app/kvkk/     KVKK notice (Turkish original)
 - https://nardin.app                  the developer's studio page
 
 ## Facts worth knowing

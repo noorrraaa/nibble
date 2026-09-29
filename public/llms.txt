@@ -34,8 +34,8 @@ Golden rules for agents:
 ## About
 
 - [Home](https://nibble.nardin.app/): what Nibble is; free, no account, no server
-- [Privacy policy (Turkish)](https://nibble.nardin.app/gizlilik/): drawings never leave the browser; cookieless Cloudflare Web Analytics counts visits
-- [KVKK notice (Turkish)](https://nibble.nardin.app/kvkk/)
+- [Privacy policy](https://nibble.nardin.app/privacy/): drawings never leave the browser; cookieless Cloudflare Web Analytics counts visits (English translation; the [Turkish original](https://nibble.nardin.app/gizlilik/) prevails)
+- [KVKK notice](https://nibble.nardin.app/kvkk/en/): Turkish data protection notice in English (the [Turkish original](https://nibble.nardin.app/kvkk/) prevails)
 - [Nardin](https://nardin.app): the independent developer (Emre Kızak) behind Nibble
 
 ## Optional

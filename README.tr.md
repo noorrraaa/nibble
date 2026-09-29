@@ -7,7 +7,8 @@
 Nibble tamamen tarayıcıda çalışır. Backend yok, kayıt yok, yükleme yok, ücretli
 paket yok. Çalışman kendi tarayıcında (IndexedDB) durur ve hiçbir yere gitmez.
 Sitenin ölçtüğü tek şey ziyaret sayısı: çerezsiz Cloudflare Web Analytics (toplu
-sayım, kimlik yok; bkz. `/gizlilik/`).
+sayım, kimlik yok; bkz. `/gizlilik/`,
+İngilizce çevirisi `/privacy/`).
 
 > 1 nibble = 4 bit = 16 değer = pixel art'ın klasik 16 renkli paleti.
 

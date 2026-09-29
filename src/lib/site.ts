@@ -25,6 +25,9 @@ export const LEGAL_CONTACT_EMAIL = "thecrimelogs.contact@gmail.com";
 /** Metinlerin yürürlük tarihi (sayfada gösterilir). */
 export const LEGAL_EFFECTIVE_DATE = "29 Eylül 2026";
 
+/** Aynı tarih, İngilizce çevirilerde (`/privacy/`, `/kvkk/en/`). İkisi birlikte değişir. */
+export const LEGAL_EFFECTIVE_DATE_EN = "29 September 2026";
+
 /**
  * Cloudflare Web Analytics (çerezsiz, kimlik yok, toplu sayım). Bu token GİZLİ
  * DEĞİL: her sayfanın HTML'inde zaten görünür. Yalnız üretim derlemesinde,

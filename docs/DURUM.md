@@ -1,5 +1,14 @@
 # NIBBLE — Durum ve Devam Notu
 
+> **2026-09-29 (İngilizce hukuki sayfalar, commit'lendi, push/deploy YOK):**
+> - ✅ `/privacy/` (gizlilik) ve `/kvkk/en/` (KVKK) İngilizce çeviriler; içerik farkı yok, başta
+>   "Turkish version prevails" notu. Metin `legal.ts` → `privacyDocEn` / `kvkkDocEn`; `legal.test.ts`
+>   bölüm/madde sayısı, adresler, tarih ve e-posta eşleşmesini kilitliyor.
+> - ✅ Dil bağlantıları (üst bar "English" / "Türkçe"), `hreflang` + kanonik, `og:locale`, site
+>   haritasında `xhtml:link` karşılıkları (`seo.ts` → `LEGAL_ALTERNATES`). `<html lang>` hukuki
+>   sayfada metnin dilinden gelir. Alt bilgi bağlantıları arayüz diline göre seçiliyor.
+> - Canlıda henüz yok: Coolify'da **Redeploy** gerekiyor. 390px ekran görüntüsü kontrol edildi.
+
 > **2026-09-29 (analitik + keşfedilebilirlik turu, commit'lendi, push/deploy YOK):**
 > - ✅ **Cloudflare Web Analytics** (token `site.ts` → `CF_ANALYTICS_TOKEN`), kök layout'ta tek
 >   `<script defer>`, yalnız `NODE_ENV=production`. CSP `script-src`'ye

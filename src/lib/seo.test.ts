@@ -2,7 +2,7 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
-import { SITEMAP_ROUTES, absoluteUrl, canonicalPath, pageMetadata } from "./seo";
+import { LEGAL_ALTERNATES, SITEMAP_ROUTES, absoluteUrl, canonicalPath, languageAlternates, pageMetadata } from "./seo";
 import { SITE_URL } from "./site";
 
 // test-build/ altından proje köküne
@@ -45,4 +45,17 @@ test("OG resmi public/ altında gerçekten var ve 1200x630 PNG", () => {
   const buf = readFileSync(join(ROOT, "public", "og.png"));
   assert.equal(buf.subarray(1, 4).toString("ascii"), "PNG");
   assert.deepEqual([buf.readUInt32BE(16), buf.readUInt32BE(20)], [1200, 630]);
+});
+
+test("hukuki sayfaların iki dili de site haritasında ve hreflang karşılıklı", () => {
+  for (const alt of Object.values(LEGAL_ALTERNATES)) {
+    for (const path of Object.values(alt)) {
+      assert.ok((SITEMAP_ROUTES as readonly string[]).includes(path), path);
+      assert.deepEqual(languageAlternates(path), alt, path);
+    }
+  }
+  assert.equal(languageAlternates("/editor/"), undefined);
+  const m = pageMetadata({ path: "/privacy/", title: "T", description: "D", languages: LEGAL_ALTERNATES.privacy, locale: "en_US" });
+  assert.deepEqual(m.alternates?.languages, { tr: "/gizlilik/", en: "/privacy/" });
+  assert.equal((m.openGraph as { locale?: string }).locale, "en_US");
 });

@@ -17,7 +17,15 @@
  * hepsini değil.
  */
 
-import { CF_ANALYTICS_INFO_URL, LEGAL_CONTACT_EMAIL, LEGAL_CONTROLLER, LEGAL_EFFECTIVE_DATE } from "./site";
+import {
+  CF_ANALYTICS_INFO_URL,
+  LEGAL_CONTACT_EMAIL,
+  LEGAL_CONTROLLER,
+  LEGAL_EFFECTIVE_DATE,
+  LEGAL_EFFECTIVE_DATE_EN,
+} from "./site";
+
+export type LegalLang = "tr" | "en";
 
 export interface LegalSection {
   heading: string;
@@ -26,11 +34,21 @@ export interface LegalSection {
 }
 
 export interface LegalDoc {
+  lang: LegalLang;
   title: string;
   lede: string;
   effective: string;
+  /** Yalnız çevirilerde: Türkçe metnin esas olduğunu söyleyen not. */
+  translationNote?: string;
   sections: LegalSection[];
 }
+
+/**
+ * İngilizce çevirilerin başındaki not. Bağlayıcı olan Türkçe metin; çeviri
+ * yalnız kolaylık için (içerik farkı yok, `legal.test.ts` eşleşmeyi kilitliyor).
+ */
+export const TRANSLATION_NOTE_EN =
+  "This is a translation provided for convenience; the Turkish version prevails in case of conflict.";
 
 const LINK_RE = /(https:\/\/[^\s)]+[^\s).,]|[\w.+-]+@[\w-]+(?:\.[\w-]+)+)/g;
 
@@ -52,8 +70,17 @@ export function contactLine(email: string = LEGAL_CONTACT_EMAIL): string {
     : "Başvuru için iletişim adresi yakında bu sayfada yayımlanacak.";
 }
 
+/** `contactLine`'ın İngilizcesi; aynı kural: adres yoksa uydurmaz. */
+export function contactLineEn(email: string = LEGAL_CONTACT_EMAIL): string {
+  const e = email.trim();
+  return e
+    ? `For questions and requests: ${e}`
+    : "A contact address for requests will be published on this page soon.";
+}
+
 export function privacyDoc(email: string = LEGAL_CONTACT_EMAIL): LegalDoc {
   return {
+    lang: "tr",
     title: "Gizlilik Politikası",
     lede:
       "Nibble tarayıcında çalışan bir pixel art ve animasyon editörü. Üyelik yok, hesap yok, " +
@@ -121,6 +148,7 @@ export function privacyDoc(email: string = LEGAL_CONTACT_EMAIL): LegalDoc {
 
 export function kvkkDoc(email: string = LEGAL_CONTACT_EMAIL): LegalDoc {
   return {
+    lang: "tr",
     title: "KVKK Aydınlatma Metni",
     lede:
       "6698 sayılı Kişisel Verilerin Korunması Kanunu'nun 10. maddesi uyarınca, Nibble'ı kullanırken " +
@@ -181,6 +209,150 @@ export function kvkkDoc(email: string = LEGAL_CONTACT_EMAIL): LegalDoc {
       {
         heading: "8. Başvuru",
         paragraphs: [contactLine(email)],
+      },
+    ],
+  };
+}
+
+/* ------------------------------------------------------------------ */
+/* İngilizce çeviriler (UI İngilizce olan kullanıcılar için).          */
+/* Yalnız çeviri: bölüm sayısı, madde sayısı, adresler ve tarih        */
+/* Türkçe metinle birebir; bir tarafı değiştiren ötekini de değiştirir. */
+/* ------------------------------------------------------------------ */
+
+export function privacyDocEn(email: string = LEGAL_CONTACT_EMAIL): LegalDoc {
+  return {
+    lang: "en",
+    title: "Privacy Policy",
+    lede:
+      "Nibble is a pixel art and animation editor that runs in your browser. No sign-up, no account, " +
+      "no server of ours: your drawings stay on your own device.",
+    effective: LEGAL_EFFECTIVE_DATE_EN,
+    translationNote: TRANSLATION_NOTE_EN,
+    sections: [
+      {
+        heading: "1. What is stored, and where?",
+        bullets: [
+          "Your projects (frames, layers, palette, parts) are stored in your browser's IndexedDB storage, on this device only.",
+          "Your settings (such as theme and language) are stored in your browser's local storage (localStorage).",
+          "None of this is sent to us. If you clear your browser data or use another device or browser, you will not see your projects there; to keep a backup, export your project.",
+        ],
+      },
+      {
+        heading: "2. What we do not collect",
+        bullets: [
+          "We do not ask for an account, name, email address or phone number.",
+          "We do not use cookies. The visit counter does not use cookies or browser storage either.",
+          "No ads, no scripts that aim to identify you or track you across sites, and no third-party fonts are loaded. The only external script loaded is the visit counter described in section 3.",
+          "Your drawings and projects are not part of the visit counter either; they are not sent anywhere.",
+        ],
+      },
+      {
+        heading: "3. Visit statistics (Cloudflare Web Analytics)",
+        paragraphs: [
+          "We use Cloudflare Web Analytics to see which pages are used and how much. It does not use cookies, leaves no identifier on your device and does not identify you.",
+          "When a page opens, your browser sends Cloudflare the following: the address of the page opened, the page you came from (referrer), your browser and operating system type, and performance measurements such as how long the page took to load. The country is derived from the IP address of the connection. Cloudflare states that in this service it does not track visitors by IP address or browser information.",
+          "We only see aggregate counts (for example, how many times a page was opened this week, which countries visits came from); we do not see records belonging to any single person.",
+          `Provided by: Cloudflare, Inc. (USA). This information is processed abroad. Details: ${CF_ANALYTICS_INFO_URL}`,
+          "If you block this script with an ad blocker or a browser setting, Nibble works exactly the same.",
+        ],
+      },
+      {
+        heading: "4. The server that delivers the page",
+        paragraphs: [
+          "Nibble consists only of static files and is hosted on a server in Turkey. As with any website, the server may briefly keep technical logs made during access, such as your IP address, browser information and the page requested, for security and operational purposes. These logs do not contain your drawings.",
+        ],
+      },
+      {
+        heading: "5. If you connect an AI agent",
+        paragraphs: [
+          "If you bring your own AI agent (for example, a browser extension), the agent calls the window.nibble interface on the page, in your browser. The agent can read your canvas and may send that information to its own service; that transfer is between you and the agent's provider, and no Nibble server is involved.",
+          "You decide what the agent can do from the agent panel in the editor: you can switch drawing, animation, layers, palette, irreversible actions and file/network permissions on and off one by one, or turn off the agent interface entirely. Irreversible actions and file/network permission are off by default.",
+        ],
+      },
+      {
+        heading: "6. Importing and exporting images",
+        bullets: [
+          "When you convert an image chosen from your device into pixels, the image is not sent anywhere; the processing happens in your browser.",
+          "If, with file/network permission on, an agent imports an image from an internet address, your browser downloads the image from that address and that server sees your IP address.",
+          "PNG, GIF, APNG and sprite sheet files are downloaded directly to your device.",
+        ],
+      },
+      {
+        heading: "7. Changes and contact",
+        paragraphs: [
+          "If we change this text, the current version will be published on this page with its effective date.",
+          `Data controller: ${LEGAL_CONTROLLER}. ${contactLineEn(email)}`,
+        ],
+      },
+    ],
+  };
+}
+
+export function kvkkDocEn(email: string = LEGAL_CONTACT_EMAIL): LegalDoc {
+  return {
+    lang: "en",
+    title: "KVKK Privacy Notice",
+    lede:
+      "Pursuant to Article 10 of the Turkish Personal Data Protection Law No. 6698 (KVKK), we explain below " +
+      "how your personal data is processed when you use Nibble.",
+    effective: LEGAL_EFFECTIVE_DATE_EN,
+    translationNote: TRANSLATION_NOTE_EN,
+    sections: [
+      {
+        heading: "1. Identity of the data controller",
+        paragraphs: [`Data controller: ${LEGAL_CONTROLLER} (individual developer).`],
+      },
+      {
+        heading: "2. Personal data processed",
+        paragraphs: [
+          "Nibble does not process personal data on its own server: your projects and settings are kept only on your own device, in your browser's storage, and do not reach us. No account is created; no name, email address or phone number is requested.",
+          "The data that may be processed is of two kinds. The first is the technical logs kept by the server hosting the page during access: IP address, browser information, time of access and the page requested.",
+          "The second is visit information collected with Cloudflare Web Analytics that does not identify you: the address of the page opened, the referring page, browser and operating system type, the country derived from the IP address, and page performance measurements. No cookies are used; this information is visible to us only as aggregate counts.",
+          "Your drawings and projects are not part of any of this data.",
+        ],
+      },
+      {
+        heading: "3. Purposes of processing",
+        paragraphs: [
+          "Delivering the service securely and without interruption and preventing misuse; measuring in aggregate which pages of the site are used and how much, in order to improve the service.",
+        ],
+      },
+      {
+        heading: "4. Legal grounds",
+        paragraphs: [
+          "KVKK Art. 5/2-f: the legitimate interest of the data controller, provided that it does not harm your fundamental rights and freedoms.",
+        ],
+      },
+      {
+        heading: "5. Transfer",
+        paragraphs: [
+          "Technical access logs are kept on the server in Turkey that hosts the page.",
+          `Visit statistics are processed by the service provider Cloudflare, Inc. (USA); this data is therefore transferred abroad (KVKK Art. 9). Details: ${CF_ANALYTICS_INFO_URL}`,
+          "Data is not transferred to third parties for marketing or advertising purposes and is not sold.",
+          "If you connect your own AI agent, where the agent sends the canvas information it reads is between you and that agent's provider; for that transfer, the agent's provider is the data controller.",
+        ],
+      },
+      {
+        heading: "6. Method of collection",
+        paragraphs: [
+          "Technical logs are collected by the server when you access the page, and visit statistics by the Cloudflare Web Analytics script on the page, through automated means. If you block the script in your browser, no statistics are collected and Nibble works exactly the same.",
+        ],
+      },
+      {
+        heading: "7. Your rights (KVKK Art. 11)",
+        bullets: [
+          "To learn whether your personal data is processed and, if so, to request information about it,",
+          "to learn the purpose of processing and whether it is used in line with that purpose,",
+          "to know the third parties in Turkey or abroad to whom it is transferred,",
+          "to request its correction if it is incomplete or inaccurate and, where the conditions are met, its deletion,",
+          "to object to a result against you arising from analysis exclusively by automated systems,",
+          "to claim compensation if you suffer damage due to unlawful processing.",
+        ],
+      },
+      {
+        heading: "8. Application",
+        paragraphs: [contactLineEn(email)],
       },
     ],
   };

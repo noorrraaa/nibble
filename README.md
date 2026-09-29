@@ -7,7 +7,8 @@
 Nibble runs entirely in your browser. There is no backend, no sign-up, no upload
 and no paid tier. Your work lives in your own browser (IndexedDB) and never
 leaves it. The only thing the site measures is visits, with cookieless
-Cloudflare Web Analytics (aggregate counts, no identification; see `/gizlilik/`).
+Cloudflare Web Analytics (aggregate counts, no identification; see `/privacy/`,
+Turkish original `/gizlilik/`).
 
 > 1 nibble = 4 bits = 16 values = the classic 16-colour pixel art palette.
 

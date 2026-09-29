@@ -62,12 +62,18 @@ export const viewport: Viewport = {
  * React'ten önce çalıştığı için kırpışma yok. `suppressHydrationWarning`
  * zaten <html>'de: script'in yazdığı öznitelikler hidrasyonu bozmuyor.
  * Ayarlar okunamazsa (özel mod) sessizce koyu temada kalıyor.
+ *
+ * Hukuki sayfalarda `lang` arayüz tercihinden değil METNİN dilinden gelir:
+ * `/privacy/` ve `/kvkk/en/` İngilizce, `/gizlilik/` ve `/kvkk/` Türkçe
+ * (JavaScript'siz okuyucular için `<main lang>` de aynısını söylüyor).
  */
 const THEME_BOOTSTRAP = `(function(){try{
 var s=JSON.parse(localStorage.getItem("nibble.settings.v1")||"{}");
 if(s.theme==="light"||s.theme==="dark")document.documentElement.setAttribute("data-theme",s.theme);
 var l=localStorage.getItem("nibble.lang");
 if(l!=="tr"&&l!=="en")l=(navigator.language||"").toLowerCase().indexOf("tr")===0?"tr":"en";
+var p=location.pathname;
+if(p.indexOf("/privacy/")===0||p.indexOf("/kvkk/en/")===0)l="en";else if(p.indexOf("/gizlilik/")===0||p.indexOf("/kvkk/")===0)l="tr";
 document.documentElement.lang=l;
 }catch(e){}})()`;
 
