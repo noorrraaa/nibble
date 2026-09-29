@@ -361,7 +361,8 @@ const en = {
     height: "Height",
     paletteLabel: "Palette",
     presetHint: "Presets are powers of two because sprite sheets and game-engine importers work that way. Free size: 1–512.",
-    replaceWarn: "This replaces what's on the canvas. Your current work is already saved under Drafts.",
+    replaceWarn: "Your current drawing isn't deleted. It stays in Drafts (top bar).",
+    prevInDrafts: "Previous drawing is in Drafts",
 
     importTitle: "Image to pixel art",
     size: "Size",
@@ -834,7 +835,8 @@ const tr: Dict = {
     height: "Yükseklik",
     paletteLabel: "Palet",
     presetHint: "Önayarlar ikinin kuvvetleri çünkü sprite sheet ve oyun motoru importer'ları böyle çalışır. Serbest boyut: 1–512.",
-    replaceWarn: "Bu, tuvaldekinin yerine geçer. Şu anki çalışman zaten Taslaklar'a kaydedildi.",
+    replaceWarn: "Şu anki çizimin silinmez, Taslaklar'da durur (üst bar).",
+    prevInDrafts: "Önceki çizim Taslaklar'da",
 
     importTitle: "Resimden pixel art",
     size: "Boyut",

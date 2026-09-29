@@ -1,5 +1,20 @@
 # NIBBLE — Durum ve Devam Notu
 
+> **2026-09-29 (mobil iş kaybı: otomatik kayıt, COMMIT YOK, push/deploy YOK):**
+> - ✅ Kayıt mantığı `src/lib/autosave.ts` → `AutosaveController`'a taşındı (editörde tek örnek).
+>   **1)** Belge değişince (Yeni, taslak açma, .nibble bırakma, ajan `newProject` = `replaceProject`)
+>   bekleyen kayıt artık iptal edilmiyor, eski proje önce yazılıyor; `t` bağımlılığı kalktı.
+>   **2)** İşlem bitince (batch kapanınca gelen bildirim: fırça kalktı, undo, kare…) 400 ms sonra
+>   yazıyor; darbe sürerken 2.5 sn birleştirme. `lastProjectId` IndexedDB yazımından önce senkron.
+>   **3)** Açılışta son proje yüklenene kadar (başarılı/başarısız) hiçbir şey yazılmıyor;
+>   dokunulmamış boş başlangıç tuvali hiç yazılmıyor.
+>   **4)** Yeni proje diyaloğunda "çizimin Taslaklar'da durur" uyarısı en üste alındı; önceki
+>   tuvalde çizim varsa "Önceki çizim Taslaklar'da" toast'ı.
+> - Doğrulama: **320/320 test** (12'si yeni, `autosave.test.ts`) · tsc · eslint · `next build` temiz.
+> - Kodda ✅ / **cihazda ❌**: telefonda denenmedi. Kontrol listesi: çiz → 1 sn içinde sekmeyi
+>   kapat/yenile → çizim duruyor mu; çiz → hemen Yeni → Taslaklar'da son darbe var mı; toast
+>   çıkıyor mu; ilk açılışta son proje geliyor mu (yavaş cihazda da).
+
 > **2026-09-29 (İngilizce hukuki sayfalar, commit'lendi, push/deploy YOK):**
 > - ✅ `/privacy/` (gizlilik) ve `/kvkk/en/` (KVKK) İngilizce çeviriler; içerik farkı yok, başta
 >   "Turkish version prevails" notu. Metin `legal.ts` → `privacyDocEn` / `kvkkDocEn`; `legal.test.ts`

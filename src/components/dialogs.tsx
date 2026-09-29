@@ -7,6 +7,7 @@ import Icon from "./icon";
 import { Dialog, Segmented, Slider } from "./ui";
 import { useT } from "@/lib/i18n";
 import { useEditor } from "@/lib/editor-store";
+import { projectHasPixels } from "@/lib/autosave";
 import { blankProject, PixelDocument } from "@/lib/pixel-document";
 import {
   exportApng,
@@ -36,6 +37,7 @@ export function NewProjectDialog({ onClose }: { onClose: () => void }) {
   const setDoc = useEditor((s) => s.setDoc);
   const setPaletteId = useEditor((s) => s.setPaletteId);
   const setPrimary = useEditor((s) => s.setPrimary);
+  const showToast = useEditor((s) => s.showToast);
 
   const [w, setW] = useState(32);
   const [h, setH] = useState(32);
@@ -43,6 +45,10 @@ export function NewProjectDialog({ onClose }: { onClose: () => void }) {
   const [name, setName] = useState("");
 
   const create = () => {
+    // önceki tuvalde çizim varsa otomatik kayıt onu belge değişiminde
+    // Taslaklar'a yazıyor — kullanıcıya nerede olduğunu söyle. Boş tuval
+    // kaydedilmiyor, o yüzden olmayan bir taslağı işaret etmiyoruz.
+    const hadDrawing = projectHasPixels(useEditor.getState().doc.project);
     const pal = paletteById(pid) ?? PALETTES[0];
     const doc = new PixelDocument(
       blankProject(
@@ -55,6 +61,7 @@ export function NewProjectDialog({ onClose }: { onClose: () => void }) {
     setDoc(doc);
     setPaletteId(pal.id);
     setPrimary(pal.colors[Math.min(2, pal.colors.length - 1)]);
+    if (hadDrawing) showToast(t.dialogs.prevInDrafts);
     onClose();
   };
 
@@ -73,6 +80,14 @@ export function NewProjectDialog({ onClose }: { onClose: () => void }) {
         </>
       }
     >
+      {/*
+        En üstte: "Yeni" tuvali sessizce boşaltınca kullanıcılar çizimlerinin
+        silindiğini sanıyordu. Telefonda diyalog kaydırılıyor, altta kalan
+        uyarı hiç görülmüyordu.
+      */}
+      <p className="hint" style={{ marginTop: 0, marginBottom: 12, color: "var(--gold)" }}>
+        {t.dialogs.replaceWarn}
+      </p>
       <div className="row" style={{ marginBottom: 12 }}>
         <label className="field" style={{ flex: 1 }}>
           {t.dialogs.name}
@@ -140,9 +155,6 @@ export function NewProjectDialog({ onClose }: { onClose: () => void }) {
 
       <p className="hint" style={{ marginTop: 12 }}>
         {t.dialogs.presetHint}
-      </p>
-      <p className="hint" style={{ marginTop: 8, color: "var(--gold)" }}>
-        {t.dialogs.replaceWarn}
       </p>
     </Dialog>
   );

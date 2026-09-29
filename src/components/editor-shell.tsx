@@ -8,7 +8,7 @@
  * `useEditor()` çağrısı tüm ağacı her fırça darbesinde render ettirirdi.
  */
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import CanvasStage from "./canvas-stage";
 import Icon, { type IconName } from "./icon";
@@ -19,6 +19,7 @@ import { AgentDialog, AgentTicker } from "./agent-panel";
 import { HelpDialog, Onboarding } from "./help";
 import { ExportDialog, ImportDialog, NewProjectDialog, StorageDialog } from "./dialogs";
 import { installAgentApi } from "@/lib/agent-api";
+import { AutosaveController } from "@/lib/autosave";
 import {
   clearSelection,
   copySelection,
@@ -37,7 +38,7 @@ import {
   saveProject,
   saveSettings,
 } from "@/lib/storage";
-import type { ToolId } from "@/lib/types";
+import type { Project, ToolId } from "@/lib/types";
 
 type DialogId = "new" | "import" | "storage" | "agent" | "export" | "help" | "tour";
 
@@ -376,6 +377,31 @@ export default function Editor() {
     saveSettings({ agentPolicy: { enabled: agentPolicy.enabled, scopes: agentPolicy.scopes } });
   }, [agentPolicy]);
 
+  /**
+   * Otomatik kayıt denetleyicisi bileşen ömrü boyunca TEK — belge başına
+   * yeniden kurulmuyor. Eskiden `[doc, t]` effect'i her belge değişiminde (ve
+   * dil değişiminde) bekleyen kaydı iptal ediyordu; ayrıntı lib/autosave.ts.
+   */
+  const [initialDoc] = useState(() => useEditor.getState().doc);
+  // hata mesajı güncel dilde çıksın ama dil değişimi kaydediciyi yeniden kurmasın
+  const tRef = useRef(t);
+  useEffect(() => {
+    tRef.current = t;
+  }, [t]);
+  const [autosave] = useState(
+    () =>
+      new AutosaveController<Project>({
+        persist: async (project) => {
+          // lastProjectId senkron (localStorage) ve IndexedDB yazımından ÖNCE:
+          // sayfa yazım sırasında öldürülse bile doğru projeyi işaret etsin
+          // (projenin önceki kaydı zaten orada)
+          saveSettings({ lastProjectId: project.id });
+          await saveProject(project);
+        },
+        onError: () => useEditor.getState().showToast(tRef.current.dialogs.saveFailed),
+      }),
+  );
+
   // ilk açılış: kalıcı depolama izni, ayarlar, son proje, rehber
   useEffect(() => {
     void requestPersist();
@@ -388,41 +414,53 @@ export default function Editor() {
     });
     useEditor.getState().setAgentPolicy(normalisePolicy(st.agentPolicy));
 
+    // Geri yükleme bitene kadar (başarılı ya da değil) otomatik kayıt diske
+    // yazmıyor: yoksa yükleme sürerken boş başlangıç belgesi kaydedilip
+    // lastProjectId'nin üzerine yazılıyordu ve sonraki açılışta tuval boştu.
+    let cancelled = false;
     if (st.lastProjectId) {
-      void loadProject(st.lastProjectId).then((p) => {
-        if (p && p.frames?.length) useEditor.getState().setDoc(new PixelDocument(p));
-      });
+      loadProject(st.lastProjectId)
+        .then((p) => {
+          if (cancelled) return;
+          if (p && p.frames?.length) useEditor.getState().setDoc(new PixelDocument(p));
+        })
+        .catch(() => {
+          /* okunamadı — boş tuvalle devam, kullanıcı çizince kaydedilir */
+        })
+        .finally(() => {
+          if (!cancelled) autosave.markReady();
+        });
+    } else {
+      autosave.markReady();
     }
     if (!st.tourSeen) setDialog("tour");
-  }, []);
+    return () => {
+      cancelled = true;
+    };
+  }, [autosave]);
 
-  // otomatik kayıt: 2.5 sn debounce + sekme gizlenince + kapanırken
+  // Belge değişince denetleyiciyi ona bağla — önceki belgenin bekleyen kaydı
+  // bağlanmadan ÖNCE yazılır. Başlangıçtaki dokunulmamış boş belge kirli
+  // sayılmıyor (diske boş proje yazılmasın); diğer her belge (Yeni, taslak,
+  // .nibble, geri yüklenen) hemen kaydedilir ve lastProjectId ona döner.
   useEffect(() => {
-    let timer: ReturnType<typeof setTimeout> | null = null;
-    const save = () => {
-      void saveProject(doc.project).catch(() => {
-        useEditor.getState().showToast(t.dialogs.saveFailed);
-      });
-      saveSettings({ lastProjectId: doc.project.id });
-    };
-    const schedule = () => {
-      if (timer) clearTimeout(timer);
-      timer = setTimeout(save, 2500);
-    };
-    const un = doc.subscribe(schedule);
+    autosave.attach(doc, { dirty: doc !== initialDoc });
+  }, [autosave, doc, initialDoc]);
+
+  // sekme gizlenince / sayfa kapanırken bekleyeni hemen yaz; sökülürken de
+  useEffect(() => {
+    const flush = () => autosave.flush();
     const onHide = () => {
-      if (document.visibilityState === "hidden") save();
+      if (document.visibilityState === "hidden") flush();
     };
     document.addEventListener("visibilitychange", onHide);
-    window.addEventListener("pagehide", save);
-    schedule();
+    window.addEventListener("pagehide", flush);
     return () => {
-      un();
-      if (timer) clearTimeout(timer);
       document.removeEventListener("visibilitychange", onHide);
-      window.removeEventListener("pagehide", save);
+      window.removeEventListener("pagehide", flush);
+      autosave.detach();
     };
-  }, [doc, t]);
+  }, [autosave]);
 
   // oynatma döngüsü
   useEffect(() => {
